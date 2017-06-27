@@ -15,6 +15,8 @@ class DatabaseTarget(object):
     in order to support different data structure from the database.
 
     Both ingredient and recipes can be search from this interface.
+
+    Sub-classes should return in the format defined in composite.py.
     """
 
     def __init__(self):
@@ -23,17 +25,35 @@ class DatabaseTarget(object):
 
     def retrieve_item(self, item_id):
 
+        # Use id to retrieve documents of the item
+
+        # construct the ingredient/meal item according to the format required
+
+        # return a workable object
+
         pass
 
     def retrieve_list(self, selector):
+
+        # Use the selector to retrieve a list of documents of the item
+
+        # for each of the documents, format according to composite.py
+
+        # return the list
 
         pass
 
     def insert_item(self, item):
 
+        # given an object define as in composite.py, reconstruct the document
+        # according to the specs of the particular collection
+
         pass
 
     def update_item(self, item_id, item):
+
+        # given an object defined as in composite.py, update the document 
+        # according to the specs of the particular collection.
 
         pass
 
@@ -54,12 +74,21 @@ class UsdaAdapter(DatabaseTarget):
             return None
 
         else:
-            
+            pass
         
         return item
 
     def retrieve_list(self, selector):
 
+        pass
+
+    def __meal_constructor(doc):
+
+        pass
+
+    def __ingredient_constructor(doc):
+
+        pass
 
 
 
