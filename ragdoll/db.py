@@ -6,7 +6,7 @@ import pymongo
 import bson
 import pandas as pd
 
-from composite import *
+from .composite import *
 
 
 # Implementing an adapter 
@@ -199,4 +199,4 @@ if __name__ == '__main__':
     # Now put this newIngre into the original basket
     mybasket = mybasket + newIngre
     print("The children of mybasket are: {}".format([child.name for child in mybasket.children]))
-    
+
