@@ -9,7 +9,7 @@ import pandas as pd
 from .composite import *
 
 
-# Implementing an adapter 
+# Implementing an adapter
 class DatabaseTarget(object):
     """
     This is the Target component for the adapter pattern on mongodb,
@@ -53,10 +53,11 @@ class DatabaseTarget(object):
 
     def update_item(self, item_id, item):
 
-        # given an object defined as in composite.py, update the document 
+        # given an object defined as in composite.py, update the document
         # according to the specs of the particular collection.
 
         pass
+
 
 class UsdaAdapter(DatabaseTarget):
 
@@ -72,14 +73,14 @@ class UsdaAdapter(DatabaseTarget):
         if type(item_id) != bson.objectid.ObjectId:
             item_id = bson.objectid.ObjectId(item_id)
 
-        item = self.collection.find_one({'_id' : item_id})
+        item = self.collection.find_one({'_id': item_id})
         if not item:
             print("No item found")
             return None
 
         else:
             formatted_item = self.__ingredient_constructor(item)
-        
+
         return formatted_item
 
     def retrieve_list(self, selector):
@@ -113,7 +114,8 @@ class UsdaAdapter(DatabaseTarget):
         name = doc['name']
         value = doc['value']
         unit = doc['units']
-        abbr = self.nutrient_dict[self.nutrient_dict['code'] == code]['abbr'].values[0]
+        abbr = self.nutrient_dict[self.nutrient_dict['code'] == code]['abbr']\
+               .values[0]
 
         return Nutrient(name=name, value=value, unit=unit, abbr=abbr)
 
@@ -121,14 +123,12 @@ class UsdaAdapter(DatabaseTarget):
 
         "Obtain a dictionary (as pandas dataframe) for unifying nutrients"
 
-        col_names = ['code','unit','abbr','name','prec','sort']
+        col_names = ['code', 'unit', 'abbr', 'name', 'prec', 'sort']
         with open(file, 'rb') as fout:
             lines = fout.readlines()
-            data = [line.decode(encoding="cp1252")[1:-3].split("~^~") for line in lines]
+            data = [line.decode(encoding="cp1252")[1:-3]
+                    .split("~^~") for line in lines]
         self.nutrient_dict = pd.DataFrame(data, columns=col_names)
-
-
-
 
 
 class Selector(object):
@@ -148,30 +148,7 @@ class Selector(object):
 
     def __repr__(self):
 
-        return self.desc + "\n" +  str(self.criteria)
-
-
-
-
-# # define a pymongo class for handling connection to database. 
-# # This one may not be necessary. 
-# class MongoAdapter(pymongo.MongoClient):
-
-#     def __init__(self, 
-#                  host="localhost", 
-#                  port=27017, 
-#                  database='eatech',
-#                  user=None, 
-#                  password=None):
-
-#         # Initialise connection with the database, obtain a MongoClient object
-#         pymongo.MongoClient.__init__(self, host, port)
-#         self.db = self[database]
-#         self.db.authenticate(user, password)
-
-#     def get_database(self, database, user=None, password=None):
-
-#         pass
+        return self.desc + "\n" + str(self.criteria)
 
 
 if __name__ == '__main__':
