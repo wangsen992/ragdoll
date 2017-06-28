@@ -4,8 +4,9 @@ A simple draft for experimenting with a database construction.
 
 import pymongo
 import bson
+import pandas as pd
 
-from .composite import *
+from composite import *
 
 
 # Implementing an adapter 
@@ -59,9 +60,12 @@ class DatabaseTarget(object):
 
 class UsdaAdapter(DatabaseTarget):
 
-    def __init__(self, ingredient_collection):
+    def __init__(self, ingredient_collection, dict_file="NUTR_DEF_CUS.txt"):
 
         self.collection = ingredient_collection
+
+        # Obtain a universal dictionary for nutrients
+        self.__nutrient_dict(file=dict_file)
 
     def retrieve_item(self, item_id):
 
@@ -74,9 +78,9 @@ class UsdaAdapter(DatabaseTarget):
             return None
 
         else:
-            pass
+            formatted_item = self.__ingredient_constructor(item)
         
-        return item
+        return formatted_item
 
     def retrieve_list(self, selector):
 
@@ -86,10 +90,42 @@ class UsdaAdapter(DatabaseTarget):
 
         pass
 
-    def __ingredient_constructor(doc):
+    def __ingredient_constructor(self, doc):
 
-        pass
+        name = doc['name']['long']
+        value = 100
+        unit = 'g'
+        nutrient_list = []
 
+        for nutrient in doc['nutrients']:
+            nutrient_list.append(self.__nutrient_constructor(nutrient))
+
+        nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
+
+        return IngredientComponent(name=name,
+                                   value=value,
+                                   nutrients=nutrients,
+                                   unit=unit)
+
+    def __nutrient_constructor(self, doc):
+
+        code = doc['code']
+        name = doc['name']
+        value = doc['value']
+        unit = doc['units']
+        abbr = self.nutrient_dict[self.nutrient_dict['code'] == code]['abbr'].values[0]
+
+        return Nutrient(name=name, value=value, unit=unit, abbr=abbr)
+
+    def __nutrient_dict(self, file):
+
+        "Obtain a dictionary (as pandas dataframe) for unifying nutrients"
+
+        col_names = ['code','unit','abbr','name','prec','sort']
+        with open(file, 'rb') as fout:
+            lines = fout.readlines()
+            data = [line.decode(encoding="cp1252")[1:-3].split("~^~") for line in lines]
+        self.nutrient_dict = pd.DataFrame(data, columns=col_names)
 
 
 
@@ -139,6 +175,28 @@ class Selector(object):
 
 
 if __name__ == '__main__':
-    
-    pass
 
+    # Set up connection
+    client = pymongo.MongoClient()
+    collection = client['mydatabase'].mycollection
+    
+    usda_adapter = UsdaAdapter(collection)
+    cheese = usda_adapter.retrieve_item("594504ec329fb04d99aad8df")
+    cereal = usda_adapter.retrieve_item("594504f3329fb04d99aae769")
+
+    # Set up a basket
+    mybasket = cheese + cereal
+    print("The type of mybasket is {}".format(type(mybasket)))
+
+    # Make it a meal
+    mymeal = mybasket.convert2meal(name="mymeal")
+    print("The type of {name} is {otype}".format(name=mymeal.name, otype=type(mymeal)))
+
+    # Now convert the meal into an ingredient
+    newIngre = mymeal.convert2ingre(name="chereal")
+    print("The type of {name} is {otype}".format(name=newIngre.name, otype=type(newIngre)))
+
+    # Now put this newIngre into the original basket
+    mybasket = mybasket + newIngre
+    print("The children of mybasket are: {}".format([child.name for child in mybasket.children]))
+    
