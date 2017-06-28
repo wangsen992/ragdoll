@@ -194,12 +194,6 @@ class Nutrient(object):
 			return False
 
 		if self.name != other.name:
-			print(self.name)
-			print(self.unit)
-			print(self.abbr)
-			print(other.name)
-			print(other.unit)
-			print(other.abbr)
 			raise ValueError("Nutrient names not the same.")
 			return False	
 
@@ -208,12 +202,6 @@ class Nutrient(object):
 			return False
 
 		elif self.unit != other.unit:
-			print(self.name)
-			print(self.unit)
-			print(self.abbr)
-			print(other.name)
-			print(other.unit)
-			print(other.abbr)
 			raise ValueError("Unit types not the same.")
 			return False		
 
