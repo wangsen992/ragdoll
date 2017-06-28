@@ -465,6 +465,13 @@ class Component(object):
 
 		return [nut.name for nut in self.nutrients.nutrients.values()]
 
+	def display_macro(self):
+
+		macro_nut_abbr = ['ENERC_KCAL','PROCNT', 'FAT', 'CHOCDF']
+
+		for key in macro_nut_abbr:
+			print(self.nutrients.nutrients[key])
+
 
 class IngredientComponent(Component):
 
