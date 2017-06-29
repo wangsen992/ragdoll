@@ -1,29 +1,56 @@
-"""
-Key objects for the package, including basic component, ingredient, meal, 
-nutrients, and their interactions. 
+# -*- coding: utf-8 -*-
+""" Composite structures for ragdoll operations.
+
+This module defines the basic classes for the package, including Component, 
+IngredientComponent, BasketComponent, MealComponent, Nutrient and Nutrients.
+While Nutrients is simply an aggregation of Nutrients, the four *component 
+classes are formed with a composite structure. 
 
 The idea is to apply a composite structure, such that ingredient and meal
-can be treated as the same structure by clients. Addition and substraction 
+can be treated as the same structure by clients. Addition and subtraction 
 should be abstracted with plus and minus signs for simple manipulation. 
 
-Another potential usage is to map new database information into objects defined
-in this module, and output into desired format. 
+By separating the nutrients and the ingredients, it is possible for future
+extension with more databases. 
 """
 
 from collections import defaultdict
 
 class Nutrient(object):
-	"""
-	Nutrient object handles individual-nutrient-level operations.
+	"""A basic concrete class for handling nutrient-level operations.
+
+	This serves as a **basic** class, which facilitates potential future
+	customization of nutrient classes for different databases. 
 
 	Future customization of nutrient functions can be facilitated by 
 	using a function to create functions. Methods provided to provide 
-	functions with different behaviours based on nutrient attributes. 
+	functions with different behaviors based on nutrient attributes. 
 
-	Currently Nutrient objects do not handle conversion of units.
+	* Currently Nutrient objects do not handle conversion of units. Future
+	  support required.
 	"""
 
 	def __init__(self, name, value, unit, abbr):
+		"""Initiation of Nutrient object.
+
+		Note
+		----
+		Parameters including name, unit and abbr should be coordinated by
+		the dict_file based on the NUTR_DEF_CUS.txt to ensure compatibility
+		with ingredient nutrient information from individual databases.
+		
+		Parameters
+		----------
+		name : str
+			The name of the initiated nutrient.
+		value : float
+			The value (amount) of the initiated nutrient in the given unit.
+		unit : str
+			The unit of the initiated nutrient by which the value is given.
+		abbr : str
+			The abbreviation of the initiated nutrient.
+
+		"""
 
 		self.name = name
 		self.value = value
@@ -32,6 +59,23 @@ class Nutrient(object):
 
 
 	def __add__(self, other):
+		"""Addition with another Nutrient object.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to be added. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		Nutrient
+			A Nutrient object of same type (name, unit, abbr), with value being
+			the sum of both. 
+
+		"""
+
 
 		assert self.__type_test(other), "Type mismatch between two nutrient objects."
 
@@ -41,6 +85,26 @@ class Nutrient(object):
 						abbr=self.abbr)
 
 	def __sub__(self, other):
+		"""Subtraction of another Nutrient object.
+
+		Note
+		----
+		This method currently enforces that : self.value >= other.value.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to be added. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		Nutrient
+			A Nutrient object of same type (name, unit, abbr), with value being
+			the difference between the first and the second. 
+		
+		"""
 
 		assert self.__type_test(other), "Type mismatch between two nutrient objects."
 
@@ -52,6 +116,24 @@ class Nutrient(object):
 						abbr=self.abbr)
 
 	def __mul__(self, scalar):
+		"""Multiplication with a scalar.
+
+		Note
+		----
+		This method currently enforces that : scalar >= 0
+
+		Parameters
+		----------
+		scalar: float or int
+			The scalar value to the multiplied with. 
+
+		Returns
+		-------
+		Nutrient
+			A Nutrient object of same type (name, unit, abbr), with value being
+			self.value multiplied with the scalar. 
+
+		"""
 
 		if type(scalar) not in [int, float]:
 			raise ValueError("Must be multiplied with a scalar.")
@@ -64,15 +146,48 @@ class Nutrient(object):
 						abbr=self.abbr)
 
 	def __rmul__(self, scalar):
+		"""Reverse multiplication. 
+
+		This is a supporting function for multiplication. Ensure commutative
+		rules. It directly calls self.__mul__ method.
+
+		Parameters
+		----------
+		scalar: float or int
+			The scalar value to the multiplied with. 
+
+		"""
 
 		return self.__mul__(scalar)
 
 	def __truediv__(self, other):
-		"""
-		Supports division by both scalar and nutrient of same type. 
+		"""True division by a scalar or Nutrient object of same type.
 
-		if scalar provided, returns a Nutrient object;
-		if Nutrient object of same type provided, returns a scalar.
+		A division happens in two ways. 
+			1. Divided by a scalar;
+			2. Divided by a Nutrient object of the same type. 
+
+		This method handles both situation indiscriminately for both input
+		classes. 
+
+		Note
+		----
+		This method currently enforces that : scalar > 0
+
+		Parameters
+		----------
+		other: float/int or Nutrient
+			* If type(other) in [float, int], perform division on self.value
+			  with other.
+			* If type(other) == Nutrient, after type check, division is 
+			  performed by divided self.value with other.value
+
+		Returns
+		-------
+		Nutrient:
+			A Nutrient object of same type (name, unit, abbr), with value being
+			self.value divided by the scalar or other.value. 
+
 		"""
 
 		if type(other) in [int, float]:
@@ -93,11 +208,28 @@ class Nutrient(object):
 		
 
 	def __floordiv__(self, other):
-		"""
-		Supports floor division by both scalar and nutrient of same type. 
+		"""Floor division by a scalar or Nutrient object of same type.
+		
+		Note
+		----
+		This method enforces that : scalar > 0
+
+		Parameters
+		----------
+		other: float/int or Nutrient
+			* If type(other) in [float, int], perform division on self.value
+			  with other.
+			* If type(other) == Nutrient, after type check, division is 
+			  performed by divided self.value with other.value
 
 		if scalar provided, returns a Nutrient object;
 		if Nutrient object of same type provided, returns a scalar.
+
+		Returns
+		-------
+		Nutrient:
+			A Nutrient object of same type (name, unit, abbr), with value being
+			self.value divided by the scalar or other.value.
 		"""
 
 		if type(other) in [int, float]:
@@ -116,11 +248,28 @@ class Nutrient(object):
 			raise TypeError("Must be divided with a scalar or Nutrient object of the same type.")
 
 	def __mod__(self, other):
-		"""
-		Supports floor division by both scalar and nutrient of same type. 
+		"""modulus by a scalar or Nutrient object of same type.
+
+		Note
+		----
+		This method enforces that : scalar > 0
+
+		Parameters
+		----------
+		other: float/int or Nutrient
+			* If type(other) in [float, int], perform division on self.value
+			  with other.
+			* If type(other) == Nutrient, after type check, division is 
+			  performed by divided self.value with other.value
 
 		if scalar provided, returns a Nutrient object;
 		if Nutrient object of same type provided, returns a scalar.
+
+		Returns
+		-------
+		Nutrient:
+			A Nutrient object of same type (name, unit, abbr), with value being
+			self.value modularized by the scalar or other.value.
 		"""
 
 		if type(other) in [int, float]:
@@ -139,43 +288,133 @@ class Nutrient(object):
 			raise TypeError("Must be modularized with a scalar or Nutrient object of the same type.")
 
 	def __lt__(self, other):
+		"""Check less than condition with another Nutrient.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to be compared with. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		bool
+			True if less than, False otherwise.
+
+		"""
 
 		if self.__type_test(other):
 
 			return self.value < other.value
 
 	def __le__(self, other):
+		"""Check less than or equal to condition with another Nutrient.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to compared with. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		bool
+			True if less than or equal to, False otherwise.
+
+		"""
 
 		if self.__type_test(other):
 
 			return self.value <= other.value
 
 	def __eq__(self, other):
+		"""Check equal to condition with another Nutrient.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to compared with. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		bool
+			True if equal, False otherwise.
+
+		"""
 
 		if self.__type_test(other):
 
 			return self.value == other.value
 
 	def __ne__(self, other):
-		"Inequality can only be tested with nutrients of the same type."
+		"""Check unequal to condition with another Nutrient.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to compared with. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		bool
+			True if unequal, False otherwise.
+
+		"""
 
 		if self.__type_test(other):
 
 			return self.value != other.value
 
 	def __ge__(self, other):
+		"""Check greater than or equal to condition with another Nutrient.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to compared with. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		bool
+			True if greater than or equal to, False otherwise.
+
+		"""
 
 		if self.__type_test(other):
 
 			return self.value >= other.value
 
 	def __gt__(self, other):
+		"""Check greater than condition with another Nutrient.
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to compared with. Enforcement on the type of
+			nutrient required. Currently it is based on equality of name, unit
+			and abbr.
+
+		Returns
+		-------
+		bool
+			True if greater, False otherwise.
+
+		"""
 
 		if self.__type_test(other):
 
 			return self.value > other.value
 
 	def __repr__(self):
+		"""The representation of objects of Nutrient class."""
 
 		format_string = "name  : {name}\n" + \
 						"value : {value:.3f}\n" + \
@@ -187,15 +426,32 @@ class Nutrient(object):
 									abbr=self.abbr)
 
 	def __type_test(self, other):
+		"""Internal method to testing compatibility.
 
-		"Test condition for operations. True to allow operations of same type."
+		Three attributes are tested: 
+			* name
+			* abbr
+			* unit
+
+		Parameters
+		----------
+		other: Nutrient
+			The other Nutrient object to compared with. 
+
+		Returns
+		-------
+		bool
+			True if compatible, False otherwise.
+
+		"""
+
 		if type(other) != Nutrient:
 			raise TypeError("Second argument must be a Nutrient object.")
 			return False
 
 		if self.name != other.name:
 			raise ValueError("Nutrient names not the same.")
-			return False	
+			return False
 
 		elif self.abbr != other.abbr:
 			raise ValueError("Abbreviations not the same.")
@@ -203,7 +459,7 @@ class Nutrient(object):
 
 		elif self.unit != other.unit:
 			raise ValueError("Unit types not the same.")
-			return False		
+			return False
 
 		return True
 

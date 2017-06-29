@@ -6,7 +6,7 @@ import pymongo
 import bson
 import pandas as pd
 
-from .composite import *
+from composite import *
 
 
 # Implementing an adapter
