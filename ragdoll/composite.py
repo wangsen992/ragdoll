@@ -63,7 +63,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to be added. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -93,7 +93,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to be added. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -124,7 +124,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		scalar: float or int
+		scalar : float or int
 			The scalar value to the multiplied with. 
 
 		Returns
@@ -153,7 +153,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		scalar: float or int
+		scalar : float or int
 			The scalar value to the multiplied with. 
 
 		"""
@@ -176,7 +176,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: float/int or Nutrient
+		other : float/int or Nutrient
 			* If type(other) in [float, int], perform division on self.value
 			  with other.
 			* If type(other) == Nutrient, after type check, division is 
@@ -216,7 +216,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: float/int or Nutrient
+		other : float/int or Nutrient
 			* If type(other) in [float, int], perform division on self.value
 			  with other.
 			* If type(other) == Nutrient, after type check, division is 
@@ -256,7 +256,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: float/int or Nutrient
+		other : float/int or Nutrient
 			* If type(other) in [float, int], perform division on self.value
 			  with other.
 			* If type(other) == Nutrient, after type check, division is 
@@ -292,7 +292,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to be compared with. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -313,7 +313,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to compared with. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -334,7 +334,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to compared with. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -355,7 +355,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to compared with. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -376,7 +376,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to compared with. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -397,7 +397,7 @@ class Nutrient(object):
 
 		Parameters
 		----------
-		other: Nutrient
+		other : Nutrient
 			The other Nutrient object to compared with. Enforcement on the type of
 			nutrient required. Currently it is based on equality of name, unit
 			and abbr.
@@ -463,66 +463,117 @@ class Nutrient(object):
 
 		return True
 
+
 class Nutrients(object):
-	"""
+	"""An organizer of a group of nutrients.
+
 	This is an organizer of nutrients, it handles the operation among
-	a cluster of nutrients.
+	clusters of nutrients.
 
 	Abbreviation, as the key of nutrients, are used for quick matching of 
-	nutrients of the same type. 
+	nutrients of the same type. The dictionary of abbreviation and nutrient
+	names are defined in a separated file, e.g. NUTR_DEF_CUS.txt.
 	
-	An important operation is to get union and intersection of available 
-	nutrients from groups of nutrients. 
+	An important concept of operation is whether use union or intersection 
+	for algebraic operations between clusters of nutrients. 
+		* Union:
 
-	Missing info handling (for mismatch of nutrients) is completely ignored
-	in this version. 
+			All nutrients' information are preserved. However, nutrients
+			with incomplete information source (not-available in certain
+			ingredient) can only indicate a minimum level of nutrient, but 
+			no indication of the upper limit. Therefore those values must
+			be used with **caution**.
 
-	Divsions between Nutrients is unknown. Not defined right now.
+		* Intersect:
+
+			Only nutrients present in all ingredients are retained and computed.
+			This ensures precise (at database level) nutritional information
+			of the resultant object.
+
+	For all operations below, **Intersect** is chosen as default. However, 
+	explicit call on operation methods without operation overloading can be 
+	made by stating *method='union'* as argument.
+	
+	Note
+	----
+	For union operation, missing info handling (for mismatch of nutrients) is 
+	completely ignored in this version. 
+
+	Divisions between Nutrients is unknown. Not defined right now.
+
 	"""
 
 	def __init__(self, source="unknown", input_nutrients=list()):
-		"""
+		"""Initiation of Nutrient object
+
 		Initialization requires type and format check on the nutrient objects
 		supplied. Therefore, the addition of nutrients can be handled by 
-		add_nutrients method, which conducts the type and format check.
+		__add_nutrients method, which conducts the type and format check.
+
+		Parameters
+		----------
+		source : str
+			The source name of the Nutrients, typically the name of ingredient
+			containing the Nutrients object.
+		input_nutrients : list
+			A list of children (IngredientComponent or MealComponent) to be
+			included at the initialization of the Nutrients object.
+
 		"""
 
 		self.source = source
 		self.nutrients = dict()
-		self.add_nutrients(*input_nutrients)
+		self.__add_nutrients(*input_nutrients)
 
 		
 
-	def add_nutrients(self, *nutrients):
-		"""
-		This method is used to construct Nutrients object.
+	def __add_nutrients(self, *nutrients):
+		"""Insert nutrients into the Nutrients object.
 
-		If a list is inputted, add asterisk to tell the method that it is a 
-		list.
-
-		For a list with number of nutrients of the same type, consolidate first 
-		before addition.
+		Note
+		----
+		As the number of nutrients is not certain, asterisk (*) is added for 
+		the function to be able to handle both single, double entry or entry 
+		as a list. 
+		
+		Parameters
+		----------
+		*nutrients : Nutrient or list of Nutrient objects
+			Nutrient object or a list of Nutrient objects to be added.
+		
 		"""
 
 
 		for nutrient in nutrients:
 
 			if nutrient.abbr in self.nutrients:
+				# Cumulate nutrient values if there is existing Nutrient object
+				# of the same type.
 
 				assert self.nutrients[nutrient.abbr]._Nutrient__type_test(nutrient), "Nutrient not compatible with existing nutrient"
 				self.nutrients[nutrient.abbr] = self.nutrients[nutrient.abbr] + nutrient
 			else:
+				# Add Nutrient to collection if no existing Nutrient object
+				# of the same type. 
 				self.nutrients[nutrient.abbr] = nutrient
 
 
 	def __nutrient_check(nutrient):
+		"""A nutrient check on inputting nutrients
+		
+		This is now only a loner function, not called anywhere. 		
 
-		"""
 		Check the type and format of the input nutrient. Only passed one can be
 		added to the Nutrients object. 
 
 		Currently, only the type check is conducted. Potentially in the future,
 		a more sophisticated format can be implemented for better control.
+
+		Parameters
+		----------
+		nutrient : Nutrient
+			Input Nutrient object to be checked.
+
 		"""
 
 		# Check on type
@@ -531,15 +582,26 @@ class Nutrients(object):
 
 
 	def add(self, other, method="intersect"):
-		"""
-		This is a manipulation on the Nutrients objects. This is then reused 
-		for operation overloading. 
+		"""Addition with another Nutrients object
 
-		Arguments:
-		other: Nutrients, 
-		method: str, method for handling mismatch between Nutrients objects. 
-				"union" : union of nutrients, annotation in nutrient
-				"intersect" : intersect of nutrients, no annotation possible.
+		Performs summation between two Nutrients objects. When two Nutrients
+		objects are added together, the choice between **union** and 
+		**intersect** must be made. addition is performed at nutrient-level
+		for all nutrients. 
+
+		Parameters
+		----------
+		other : Nutrients
+			The other Nutrients object to be added.
+		method : str
+			Method for managing mismatching Nutrient objects within both
+			Nutrients objects. Default "intersect"
+
+		Returns
+		-------
+		Nutrients
+			Nutrients object with summation results.
+
 		"""
 
 		# check other type
@@ -549,11 +611,14 @@ class Nutrients(object):
 			else:
 				raise TypeError("Second argument not Nutrients object")
 
+		# Initiate a new dictionary for addition.
 		newNutrients_dict = dict()
 
+		# Obtain the keys from both Nutrients objects. 
 		self_keys = self.nutrients.keys()
 		other_keys = other.nutrients.keys()
 
+		# Perform addition.
 		if method == "union":
 
 			for abbr in self_keys | other_keys:
@@ -580,15 +645,37 @@ class Nutrients(object):
 						 input_nutrients=list(newNutrients_dict.values()))
 
 	def __add__(self, other):
+		"""Wrapper function of self.add for operation overloading on "+". """
 
 		return self.add(other, method="intersect")
 
 	def __radd__(self, other):
+		"""Wrapper function of self.add for operation overloading on "+". """
 
 		return self.add(other, method="intersect")
 
 	def sub(self, other, method="intersect"):
+		"""Subtraction of another Nutrients object
 
+		Performs subtraction between two Nutrients objects. When two Nutrients
+		objects are performing subtraction, the choice between **union** and 
+		**intersect** must be made. addition is performed at nutrient-level
+		for all nutrients. 
+
+		Parameters
+		----------
+		other : Nutrients
+			The other Nutrients object to subtract with.
+		method : str
+			Method for managing mismatching Nutrient objects within both
+			Nutrients objects. Default "intersect"
+
+		Returns
+		-------
+		Nutrients
+			Nutrients object with subtraction results.
+
+		"""
 		# check other type
 		if type(other) != Nutrients:
 			raise TypeError("Second argument not Nutrients object")
@@ -624,11 +711,30 @@ class Nutrients(object):
 						 input_nutrients=list(newNutrients_dict.values()))
 
 	def __sub__(self, other):
+		"""Wrapper function of self.sub for operation overloading on "-". """
 
 		return self.sub(other, method="intersect")
 
 
 	def __mul__(self, scalar):
+		"""Multiplication with a scalar.
+
+		Note
+		----
+		This method currently enforces that : scalar >= 0
+
+		Parameters
+		----------
+		scalar : float or int
+			The scalar value to the multiplied with. 
+
+		Returns
+		-------
+		Nutrients
+			A Nutrients object of with the same Nutrient objects, with value
+			of each being Nutrient.value multiplied with the scalar. 
+
+		"""
 
 		if type(scalar) not in [int, float]:
 			raise ValueError("Must be multiplied with a scalar.")
@@ -645,10 +751,29 @@ class Nutrients(object):
 						 input_nutrients=list(newNutrients_dict.values()))
 
 	def __rmul__(self, scalar):
+		"""Wrapper function of self.__mul__ for operation overloading on "*"."""
 
 		return self.__mul__(scalar)
 
 	def __truediv__(self, scalar):
+		"""Division of a scalar.
+
+		Note
+		----
+		This method currently enforces that : scalar > 0
+
+		Parameters
+		----------
+		scalar : float or int
+			The scalar value to the multiplied with. 
+
+		Returns
+		-------
+		Nutrients
+			A Nutrients object of with the same Nutrient objects, with value
+			of each being Nutrient.value divided by the scalar. 
+
+		"""
 
 		if type(scalar) not in [int, float]:
 			raise ValueError("Must be multiplied with a scalar.")
@@ -666,6 +791,7 @@ class Nutrients(object):
 
 
 	def __repr__(self):
+		"""Representation of Nutrients object."""
 
 		return "Source : {}\n".format(self.source) +\
 			   "Number of nutrients : {}\n".format(len(self.nutrients)) +\
@@ -715,6 +841,10 @@ class Component(object):
 
 		for key in macro_nut_abbr:
 			print(self.nutrients.nutrients[key])
+
+	def to_json(self):
+
+		pass
 
 
 class IngredientComponent(Component):
