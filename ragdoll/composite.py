@@ -802,14 +802,14 @@ class Nutrients(object):
 
 class Component(object):
 
-	def __init__(self, name="unknown", meta=dict()):
+	def __init__(self, name="unknown"):
 
 		self.name = name
 		self.value = 0
 		self.unit = 'g'
 		self.children = list()
 		self.nutrients = Nutrients(source=name)
-		self.meta = meta
+		self.meta = dict()
 
 
 	def __add__(self, other):
@@ -834,7 +834,7 @@ class Component(object):
 
 	def insert_meta(self, key, value):
 
-		self.meta[key] = value
+		pass
 
 	def list_nutrients(self):
 
@@ -847,15 +847,27 @@ class Component(object):
 		for key in macro_nut_abbr:
 			print(self.nutrients.nutrients[key])
 
+	def display_minerals(self):
+
+		mineral_nut_abbr = ['CA', 'FE', 'MG', 'P', 'K', 'NA', 'ZN', 'CU', 'FLD',
+							'MN', 'SE']
+
+		for key in mineral_nut_abbr:
+			try:
+				print(self.nutrients.nutrients[key])
+			except:
+				continue
+
 
 class IngredientComponent(Component):
 
 	def __init__(self, name, value, nutrients, unit='g', meta=dict()):
 
-		Component.__init__(self, name, meta=meta)
+		Component.__init__(self, name)
 		self.value = value
 		self.unit = unit
 		self.nutrients = nutrients
+		self.meta = meta
 
 	def add(self, other):
 
@@ -919,6 +931,10 @@ class IngredientComponent(Component):
 			   "Value : {} {}\n".format(self.value, self.unit) +\
 			   "Nutrients: \n" +\
 			   self.nutrients.__repr__()
+
+	def insert_meta(self, key, value):
+
+		self.meta[key] = value
 
 
 		
@@ -1061,6 +1077,10 @@ class MealComponent(BasketComponent):
 			   "Children \n{}\n".format([child.name for child in self.children]) +\
 			   "Nutrients: \n" +\
 			   self.nutrients.__repr__()
+
+	def insert_meta(self, key, value):
+
+		self.meta[key] = value
 
 
 
