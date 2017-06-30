@@ -6,10 +6,10 @@ import pymongo
 import bson
 import pandas as pd
 
-from composite import *
+from .composite import *
 
 # Script initiation with nutrient dicitonary
-dict_file = "NUTR_DEF_CUS.txt"
+dict_file = "ragdoll/NUTR_DEF_CUS.txt"
 col_names = ['code', 'unit', 'abbr', 'name', 'prec', 'sort']
 with open(dict_file, 'rb') as fout:
     lines = fout.readlines()
@@ -18,7 +18,7 @@ with open(dict_file, 'rb') as fout:
 nutrient_dict = pd.DataFrame(data, columns=col_names)
 
 # Foodmate dict
-fm_dict_file = "NUTR_DEF_FM.txt"
+fm_dict_file = "ragdoll/NUTR_DEF_FM.txt"
 col_names = ['code', 'unit', 'abbr', 'name']
 with open(fm_dict_file, 'rb') as fout:
     lines = fout.readlines()
@@ -124,14 +124,14 @@ class RetrieveItemVisitor(Visitor):
 
     def visitUsdaNode(usda_node):
 
-        def __ingredient_constructor(doc):
+        def __ingredient_constructor(ing_doc):
 
-            name = doc['name']['long']
+            name = ing_doc['name']['long']
             value = 100
             unit = 'g'
             nutrient_list = []
 
-            for nutrient in doc['nutrients']:
+            for nutrient in ing_doc['nutrients']:
                 nutrient_list.append(__nutrient_constructor(nutrient))
 
             nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
@@ -139,20 +139,22 @@ class RetrieveItemVisitor(Visitor):
             ingredient =  IngredientComponent(name=name,
                                               value=value,
                                               nutrients=nutrients,
-                                              unit=unit)
+                                              unit=unit,
+                                              meta={"collection" : usda_node.col_name,
+                                                    "item_id" : str(ing_doc["_id"])})
 
             # insert meta information about database
-            ingredient.insert_meta("collection", usda_node.col_name)
-            ingredient.insert_meta("item_id", str(doc["_id"]))
+            # ingredient.insert_meta("collection", usda_node.col_name)
+            # ingredient.insert_meta("item_id", str(ing_doc["_id"]))
           
             return ingredient
 
-        def __nutrient_constructor(doc):
+        def __nutrient_constructor(nut_doc):
 
-            code = doc['code']
-            name = doc['name']
-            value = doc['value']
-            unit = doc['unit']
+            code = nut_doc['code']
+            name = nut_doc['name']
+            value = nut_doc['value']
+            unit = nut_doc['unit']
             abbr = nutrient_dict[nutrient_dict['code'] == code]['abbr']\
                    .values[0]
 
@@ -168,14 +170,14 @@ class RetrieveItemVisitor(Visitor):
 
     def visitFoodmateNode(fm_node):
 
-        def __ingredient_constructor(doc):
+        def __ingredient_constructor(ing_doc):
 
-            name = doc['name']
+            name = ing_doc['name']
             value = 100
             unit = 'g'
             nutrient_list = []
 
-            for nutrient in doc['nutrients'].items():
+            for nutrient in ing_doc['nutrients'].items():
                 nutrient_list.append(__nutrient_constructor(nutrient))
 
             nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
@@ -183,18 +185,20 @@ class RetrieveItemVisitor(Visitor):
             ingredient =  IngredientComponent(name=name,
                                               value=value,
                                               nutrients=nutrients,
-                                              unit=unit)
+                                              unit=unit,
+                                              meta={"collection" : fm_node.col_name,
+                                                    "item_id" : str(ing_doc["_id"])})
 
             # insert meta information about database
-            ingredient.insert_meta("collection", fm_node.col_name)
-            ingredient.insert_meta("item_id", str(doc["_id"]))
+            # ingredient.insert_meta("collection", fm_node.col_name)
+            # ingredient.insert_meta("item_id", str(ing_doc["_id"]))
 
             return ingredient
 
-        def __nutrient_constructor(doc):
+        def __nutrient_constructor(nut_doc):
 
-            name = doc[0].split('(')[0]
-            value = doc[1]
+            name = nut_doc[0].split('(')[0]
+            value = nut_doc[1]
             unit = fm_nutrient_dict[fm_nutrient_dict['name']==name]['unit'].values[0]
             abbr = fm_nutrient_dict[fm_nutrient_dict['name']==name]['abbr'].values[0]
 
@@ -209,21 +213,24 @@ class RetrieveItemVisitor(Visitor):
     def visitDiyNode(DiyNode):
         "No recipe for now."
 
-        def __meal_constructor(doc):
+        def __meal_constructor(meal_doc):
 
-            name = doc['name']
-            children = []
+            name = meal_doc['name']
+            children = list()
 
-            for ingre in doc['materials']:
+            for ingre in meal_doc['materials']:
                 child = DiyNode.mongod.retrieve_item("Foodmate", str(ingre['ingredient_index']))
-                children.append(child / 100 * ingre['cook_amt'])
-
+                print([child.meta['item_id'] for child in children])
+                newchild = child / 100 * ingre['cook_amt']
+                children.append(newchild)
+                print([child.meta['item_id'] for child in children])
+            
             meal = MealComponent(name=name,
                                  children=children)
 
             # insert meta information about database
             meal.insert_meta("collection", DiyNode.col_name)
-            meal.insert_meta("item_id", str(doc["_id"]))
+            meal.insert_meta("item_id", str(meal_doc["_id"]))
 
             return meal
 
@@ -255,7 +262,7 @@ class InsertItemVisitor(Visitor):
             ingredient.meta['source'] = "Analytical from ragdoll"
 
         # Organize nutrients into dict
-        nut_dict = {"{name}({unit}".format(name=nut.name, unit=nut.unit) : nut.value\
+        nut_dict = {"{name}({unit})".format(name=nut.name, unit=nut.unit) : nut.value\
                     for nut in ingredient.nutrients.nutrients.values()}
 
         # Organize out_dict
@@ -284,7 +291,7 @@ class InsertItemVisitor(Visitor):
 
             ingre_dict = {"name" : child.name,
                           "cook_amt" : child.value,
-                          "ingredient_index" : bson.objectid.ObjectId(child.meta["item_id"])}
+                          "ingredient_index" : bson.objectid.ObjectId(child.metanew["item_id"])}
             out_dict['materials'].append(ingre_dict)
 
         # Insert to DIY
