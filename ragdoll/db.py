@@ -8,31 +8,64 @@ import pandas as pd
 
 from composite import *
 
+# Script initiation with nutrient dicitonary
+dict_file = "NUTR_DEF_CUS.txt"
+col_names = ['code', 'unit', 'abbr', 'name', 'prec', 'sort']
+with open(dict_file, 'rb') as fout:
+    lines = fout.readlines()
+    data = [line.decode(encoding="cp1252")[1:-3]
+            .split("~^~") for line in lines]
+nutrient_dict = pd.DataFrame(data, columns=col_names)
+
+# Foodmate dict
+fm_dict_file = "NUTR_DEF_FM.txt"
+col_names = ['code', 'unit', 'abbr', 'name']
+with open(fm_dict_file, 'rb') as fout:
+    lines = fout.readlines()
+    data = [line.decode(encoding="utf-8")[:-1]
+            .split("~^~") for line in lines]
+fm_nutrient_dict = pd.DataFrame(data, columns=col_names)
+
 
 # Implementing an adapter
-class DatabaseTarget(object):
-    """
-    This is the Target component for the adapter pattern on mongodb,
-    in order to support different data structure from the database.
+class MongoDB(object):
+    """MongoDB connection and support requests
 
-    Both ingredient and recipes can be search from this interface.
-
-    Sub-classes should return in the format defined in composite.py.
+    
     """
 
-    def __init__(self):
+    def __init__(self, 
+                 host="localhost", 
+                 port=27017, 
+                 database="mydatabase",
+                 user=None,
+                 password=None):
+        """Initiation with Mongodb databases
 
-        pass
+        Parameters
+        ----------
+        Refer to pymongo.MongoClient
 
-    def retrieve_item(self, item_id):
+        """
+        client = pymongo.MongoClient(host=host, port=port)
+        self.database = client[database]
+        if bool(user) & bool(password):
+            self.database.authenticate(name=user, password=password)
 
-        # Use id to retrieve documents of the item
+    def retrieve_item(self, col_name, item_id):
 
-        # construct the ingredient/meal item according to the format required
+        # Use id to retrieve document of the item
+        if col_name == "USDA":
+            node = UsdaNode(col_name)
+        elif col_name == "Foodmate":
+            node = FoodmateNode(col_name)
+        elif col_name == "DIY":
+            node = DiyNode(col_name)
 
-        # return a workable object
+        node.set_id(item_id)
+        node.set_mongod(self)
+        return node.accept(RetrieveItemVisitor)
 
-        pass
 
     def retrieve_list(self, selector):
 
@@ -44,12 +77,21 @@ class DatabaseTarget(object):
 
         pass
 
-    def insert_item(self, item):
+    def insert_item(self, col_name, item):
 
-        # given an object define as in composite.py, reconstruct the document
-        # according to the specs of the particular collection
+        # input item is either ingredient or meal, we treat them all the same. 
+        if col_name == "USDA":
+            node = UsdaNode(col_name)
+        elif col_name == "Foodmate":
+            node = FoodmateNode(col_name)
+        elif col_name == "DIY":
+            node = DiyNode(col_name)
 
-        pass
+        node.set_component(item)
+        node.set_mongod(self)
+        return node.accept(InsertItemVisitor)
+
+
 
     def update_item(self, item_id, item):
 
@@ -59,130 +101,251 @@ class DatabaseTarget(object):
         pass
 
 
-class UsdaAdapter(DatabaseTarget):
+class Visitor(object):
 
-    def __init__(self, ingredient_collection, dict_file="NUTR_DEF_CUS.txt"):
+    def __init__(self, text):
 
-        self.collection = ingredient_collection
+        self.text=text
 
-        # Obtain a universal dictionary for nutrients
-        self.__nutrient_dict(file=dict_file)
-
-    def retrieve_item(self, item_id):
-
-        if type(item_id) != bson.objectid.ObjectId:
-            item_id = bson.objectid.ObjectId(item_id)
-
-        item = self.collection.find_one({'_id': item_id})
-        if not item:
-            print("No item found")
-            return None
-
-        else:
-            formatted_item = self.__ingredient_constructor(item)
-
-        return formatted_item
-
-    def retrieve_list(self, selector):
+    def visitUsdaNode(usda_node):
 
         pass
 
-    def __meal_constructor(doc):
+    def visitFoodmateNode(fm_node):
 
-        # This is a recursive structure travelling to the bottom of the tree.
-        
+        pass
 
-    def __ingredient_constructor(self, doc):
+    def visitDiyNode(DiyNode):
 
-        name = doc['name']['long']
-        value = 100
-        unit = 'g'
-        nutrient_list = []
-
-        for nutrient in doc['nutrients']:
-            nutrient_list.append(self.__nutrient_constructor(nutrient))
-
-        nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
-
-        ingredient =  IngredientComponent(name=name,
-                                          value=value,
-                                          nutrients=nutrients,
-                                          unit=unit)
-
-        # insert meta information about database
-        ingredient.insert_meta("collection", self.collection.name)
-        ingredient.insert_meta("item_id", str(doc["_id"]))
-
-        return ingredient
-
-    def __nutrient_constructor(self, doc):
-
-        code = doc['code']
-        name = doc['name']
-        value = doc['value']
-        unit = doc['units']
-        abbr = self.nutrient_dict[self.nutrient_dict['code'] == code]['abbr']\
-               .values[0]
-
-        return Nutrient(name=name, value=value, unit=unit, abbr=abbr)
-
-    def __nutrient_dict(self, file):
-
-        "Obtain a dictionary (as pandas dataframe) for unifying nutrients"
-
-        col_names = ['code', 'unit', 'abbr', 'name', 'prec', 'sort']
-        with open(file, 'rb') as fout:
-            lines = fout.readlines()
-            data = [line.decode(encoding="cp1252")[1:-3]
-                    .split("~^~") for line in lines]
-        self.nutrient_dict = pd.DataFrame(data, columns=col_names)
+        pass
 
 
+class RetrieveItemVisitor(Visitor):
+
+    def visitUsdaNode(usda_node):
+
+        def __ingredient_constructor(doc):
+
+            name = doc['name']['long']
+            value = 100
+            unit = 'g'
+            nutrient_list = []
+
+            for nutrient in doc['nutrients']:
+                nutrient_list.append(__nutrient_constructor(nutrient))
+
+            nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
+
+            ingredient =  IngredientComponent(name=name,
+                                              value=value,
+                                              nutrients=nutrients,
+                                              unit=unit)
+
+            # insert meta information about database
+            ingredient.insert_meta("collection", usda_node.col_name)
+            ingredient.insert_meta("item_id", str(doc["_id"]))
+          
+            return ingredient
+
+        def __nutrient_constructor(doc):
+
+            code = doc['code']
+            name = doc['name']
+            value = doc['value']
+            unit = doc['unit']
+            abbr = nutrient_dict[nutrient_dict['code'] == code]['abbr']\
+                   .values[0]
+
+            return Nutrient(name=name, value=value, unit=unit, abbr=abbr)
+
+        collection = usda_node.mongod.database[usda_node.col_name]
+        doc = collection.find_one({'_id': bson.objectid.ObjectId(usda_node.id)})
+
+        # reconstruct the ingredient component
+
+        return __ingredient_constructor(doc)
 
 
-class Selector(object):
+    def visitFoodmateNode(fm_node):
 
-    def __init__(self, desc=None):
+        def __ingredient_constructor(doc):
 
-        self.desc = desc
-        self.criteria = {}
+            name = doc['name']
+            value = 100
+            unit = 'g'
+            nutrient_list = []
 
-    def add_filter(self, attr, value):
+            for nutrient in doc['nutrients'].items():
+                nutrient_list.append(__nutrient_constructor(nutrient))
 
-        self.criteria[attr] = value
+            nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
 
-    def remove_filter(self, attr):
+            ingredient =  IngredientComponent(name=name,
+                                              value=value,
+                                              nutrients=nutrients,
+                                              unit=unit)
 
-        del self.criteria[attr]
+            # insert meta information about database
+            ingredient.insert_meta("collection", fm_node.col_name)
+            ingredient.insert_meta("item_id", str(doc["_id"]))
 
-    def __repr__(self):
+            return ingredient
 
-        return self.desc + "\n" + str(self.criteria)
+        def __nutrient_constructor(doc):
+
+            name = doc[0].split('(')[0]
+            value = doc[1]
+            unit = fm_nutrient_dict[fm_nutrient_dict['name']==name]['unit'].values[0]
+            abbr = fm_nutrient_dict[fm_nutrient_dict['name']==name]['abbr'].values[0]
 
 
-if __name__ == '__main__':
+            return Nutrient(name=name, value=value, unit=unit, abbr=abbr)
 
-    # Set up connection
-    client = pymongo.MongoClient()
-    collection = client['mydatabase'].mycollection
-    
-    usda_adapter = UsdaAdapter(collection)
-    cheese = usda_adapter.retrieve_item("594504ec329fb04d99aad8df")
-    cereal = usda_adapter.retrieve_item("594504f3329fb04d99aae769")
+        collection = fm_node.mongod.database[fm_node.col_name]
+        doc = collection.find_one({'_id': bson.objectid.ObjectId(fm_node.id)})
 
-    # Set up a basket
-    mybasket = cheese + cereal
-    print("The type of mybasket is {}".format(type(mybasket)))
+        return __ingredient_constructor(doc)
 
-    # Make it a meal
-    mymeal = mybasket.convert2meal(name="mymeal")
-    print("The type of {name} is {otype}".format(name=mymeal.name, otype=type(mymeal)))
+    def visitDiyNode(DiyNode):
+        "No recipe for now."
 
-    # Now convert the meal into an ingredient
-    newIngre = mymeal.convert2ingre(name="chereal")
-    print("The type of {name} is {otype}".format(name=newIngre.name, otype=type(newIngre)))
+        def __meal_constructor(doc):
 
-    # Now put this newIngre into the original basket
-    mybasket = mybasket + newIngre
-    print("The children of mybasket are: {}".format([child.name for child in mybasket.children]))
+            name = doc['name']
+            children = []
 
+            for ingre in doc['materials']:
+                child = DiyNode.mongod.retrieve_item("Foodmate", str(ingre['ingredient_index']))
+                children.append(child / 100 * ingre['cook_amt'])
+
+            meal = MealComponent(name=name,
+                                 children=children)
+
+            # insert meta information about database
+            meal.insert_meta("collection", DiyNode.col_name)
+            meal.insert_meta("item_id", str(doc["_id"]))
+
+            return meal
+
+
+        collection = DiyNode.mongod.database[DiyNode.col_name]
+        doc = collection.find_one({"_id" : bson.objectid.ObjectId(DiyNode.id)})
+
+        return __meal_constructor(doc)
+
+
+
+
+class InsertItemVisitor(Visitor):
+
+    # def visitUsdaNode(usda_node):
+
+    #     pass
+
+    def visitFoodmateNode(fm_node):
+
+        # Decompose ingredient into reasonable format according to foodmate
+        ingredient = fm_node.component
+
+        # Check for group and source
+        if "type" not in ingredient.meta:
+            ingredient.meta['type'] = 'DIY'
+
+        if "source" not in ingredient.meta:
+            ingredient.meta['source'] = "Analytical from ragdoll"
+
+        # Organize nutrients into dict
+        nut_dict = {"{name}({unit}".format(name=nut.name, unit=nut.unit) : nut.value\
+                    for nut in ingredient.nutrients.nutrients.values()}
+
+        # Organize out_dict
+        out_dict = {"name" : ingredient.name,
+                    "type" : ingredient.meta['type'],
+                    "source" : ingredient.meta['source'],
+                    "nutrients" : nut_dict}
+
+        # Insert to foodmate
+        result = fm_node.mongod.database[fm_node.col_name].insert_one(out_dict)
+        print(result)
+
+
+    def visitDiyNode(DiyNode):
+
+        # Decompose a meal into reasonable format according to DIY format
+        meal = DiyNode.component
+
+        # get name
+        out_dict = dict()
+        out_dict['name'] = meal.name
+
+        out_dict['materials'] = []
+
+        for child in meal.children:
+
+            ingre_dict = {"name" : child.name,
+                          "cook_amt" : child.value,
+                          "ingredient_index" : bson.objectid.ObjectId(child.meta["item_id"])}
+            out_dict['materials'].append(ingre_dict)
+
+        # Insert to DIY
+        result = DiyNode.mongod.database[DiyNode.col_name].insert_one(out_dict)
+        print(result)
+
+
+
+
+
+
+
+
+class Node(object):
+
+    def __init__(self, col_name):
+
+        self.col_name = col_name
+
+    def set_id(self, id):
+
+        self.id = id
+
+    def set_mongod(self, mongod):
+
+        self.mongod = mongod
+
+    def set_component(self, component):
+
+        self.component = component
+
+    def accept(self, visitor):
+
+        pass
+
+class UsdaNode(Node):
+
+    def __init__(self, col_name):
+
+        Node.__init__(self, col_name)
+
+    def accept(self, visitor):
+
+        return visitor.visitUsdaNode(self)
+
+class FoodmateNode(Node):
+
+    def __init__(self, col_name): 
+
+        Node.__init__(self, col_name)
+
+    def accept(self, visitor):
+
+        return visitor.visitFoodmateNode(self)
+
+class DiyNode(Node):
+
+    def __init__(self, col_name):
+
+        Node.__init__(self, col_name)
+
+    def accept(self, visitor):
+
+        return visitor.visitDiyNode(self)
