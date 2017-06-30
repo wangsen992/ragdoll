@@ -89,7 +89,8 @@ class UsdaAdapter(DatabaseTarget):
 
     def __meal_constructor(doc):
 
-        pass
+        # This is a recursive structure travelling to the bottom of the tree.
+        
 
     def __ingredient_constructor(self, doc):
 
@@ -103,10 +104,16 @@ class UsdaAdapter(DatabaseTarget):
 
         nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
 
-        return IngredientComponent(name=name,
-                                   value=value,
-                                   nutrients=nutrients,
-                                   unit=unit)
+        ingredient =  IngredientComponent(name=name,
+                                          value=value,
+                                          nutrients=nutrients,
+                                          unit=unit)
+
+        # insert meta information about database
+        ingredient.insert_meta("collection", self.collection.name)
+        ingredient.insert_meta("item_id", str(doc["_id"]))
+
+        return ingredient
 
     def __nutrient_constructor(self, doc):
 
@@ -129,6 +136,8 @@ class UsdaAdapter(DatabaseTarget):
             data = [line.decode(encoding="cp1252")[1:-3]
                     .split("~^~") for line in lines]
         self.nutrient_dict = pd.DataFrame(data, columns=col_names)
+
+
 
 
 class Selector(object):
