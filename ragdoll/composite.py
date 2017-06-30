@@ -802,13 +802,14 @@ class Nutrients(object):
 
 class Component(object):
 
-	def __init__(self, name="unknown"):
+	def __init__(self, name="unknown", meta=dict()):
 
 		self.name = name
 		self.value = 0
 		self.unit = 'g'
 		self.children = list()
 		self.nutrients = Nutrients(source=name)
+		self.meta = meta
 
 
 	def __add__(self, other):
@@ -831,6 +832,10 @@ class Component(object):
 
 		pass
 
+	def insert_meta(self, key, value):
+
+		self.meta[key] = value
+
 	def list_nutrients(self):
 
 		return [nut.name for nut in self.nutrients.nutrients.values()]
@@ -842,16 +847,12 @@ class Component(object):
 		for key in macro_nut_abbr:
 			print(self.nutrients.nutrients[key])
 
-	def to_json(self):
-
-		pass
-
 
 class IngredientComponent(Component):
 
-	def __init__(self, name, value, nutrients, unit='g'):
+	def __init__(self, name, value, nutrients, unit='g', meta=dict()):
 
-		Component.__init__(self, name)
+		Component.__init__(self, name, meta=meta)
 		self.value = value
 		self.unit = unit
 		self.nutrients = nutrients
@@ -891,7 +892,8 @@ class IngredientComponent(Component):
 		return IngredientComponent(name=self.name,
 								   value=self.value * scalar,
 								   unit=self.unit,
-								   nutrients=self.nutrients * scalar)
+								   nutrients=self.nutrients * scalar,
+								   meta=self.meta)
 
 	def __rmul__(self, scalar):
 
@@ -907,7 +909,8 @@ class IngredientComponent(Component):
 		return IngredientComponent(name=self.name,
 								   value=self.value / scalar,
 								   unit=self.unit,
-								   nutrients=self.nutrients / scalar)
+								   nutrients=self.nutrients / scalar,
+								   meta=self.meta)
 
 	def __repr__(self):
 
@@ -916,6 +919,9 @@ class IngredientComponent(Component):
 			   "Value : {} {}\n".format(self.value, self.unit) +\
 			   "Nutrients: \n" +\
 			   self.nutrients.__repr__()
+
+
+		
 
 class BasketComponent(Component):
 
@@ -1055,6 +1061,7 @@ class MealComponent(BasketComponent):
 			   "Children \n{}\n".format([child.name for child in self.children]) +\
 			   "Nutrients: \n" +\
 			   self.nutrients.__repr__()
+
 
 
 if __name__ == '__main__':
