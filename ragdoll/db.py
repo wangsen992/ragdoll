@@ -134,7 +134,7 @@ class RetrieveItemVisitor(Visitor):
             for nutrient in ing_doc['nutrients']:
                 nutrient_list.append(__nutrient_constructor(nutrient))
 
-            nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
+            nutrients = Nutrients(input_nutrients=nutrient_list)
 
             ingredient =  IngredientComponent(name=name,
                                               value=value,
@@ -162,7 +162,8 @@ class RetrieveItemVisitor(Visitor):
                             value=value, 
                             unit=unit, 
                             abbr=abbr,
-                            source=usda_node.col_name)
+                            source=usda_node.col_name,
+                            name_source=usda_node.col_name)
 
         collection = usda_node.mongod.database[usda_node.col_name]
         doc = collection.find_one({'_id': bson.objectid.ObjectId(usda_node.id)})
@@ -211,7 +212,8 @@ class RetrieveItemVisitor(Visitor):
                             value=value, 
                             unit=unit, 
                             abbr=abbr,
-                            source=fm_node.col_name)
+                            source=fm_node.col_name,
+                            name_source=fm_node.col_name)
 
         collection = fm_node.mongod.database[fm_node.col_name]
         doc = collection.find_one({'_id': bson.objectid.ObjectId(fm_node.id)})

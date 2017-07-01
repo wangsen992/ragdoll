@@ -38,7 +38,7 @@ class Nutrient(object):
 	  support required.
 	"""
 
-	def __init__(self, name, value, unit, abbr, source=None):
+	def __init__(self, name, value, unit, abbr, source='Unknown', name_source='Unknown'):
 		"""Initiation of Nutrient object.
 
 		Note
@@ -57,6 +57,12 @@ class Nutrient(object):
 			The unit of the initiated nutrient by which the value is given.
 		abbr : str
 			The abbreviation of the initiated nutrient.
+		source : str
+			The source of the nutritional information, name of the database
+			collection the information is obtained from.
+		name_source : str
+			The source of the name of the nutrient, name of the database 
+			collection the name is used in. 
 
 		"""
 
@@ -64,6 +70,7 @@ class Nutrient(object):
 		self.value = value
 		self.unit = unit
 		self.abbr = abbr
+		self.name_source=name_source
 		self.source = set()
 		if source:
 			self.source.add(source)
@@ -97,7 +104,8 @@ class Nutrient(object):
 						value=self.value + other.value,
 						unit=self.unit,
 						abbr=self.abbr,
-						source=source)
+						source=source,
+						name_source=self.name_source)
 
 	def __sub__(self, other):
 		"""Subtraction of another Nutrient object.
@@ -133,7 +141,8 @@ class Nutrient(object):
 						value=self.value - other.value,
 						unit=self.unit,
 						abbr=self.abbr,
-						source=source)
+						source=source,
+						name_source=self.name_source)
 
 	def __mul__(self, scalar):
 		"""Multiplication with a scalar.
@@ -164,7 +173,8 @@ class Nutrient(object):
 						value=self.value * scalar,
 						unit=self.unit,
 						abbr=self.abbr,
-						source=self.source)
+						source=self.source,
+						name_source=self.name_source)
 
 	def __rmul__(self, scalar):
 		"""Reverse multiplication. 
@@ -218,7 +228,8 @@ class Nutrient(object):
 							value=self.value / other,
 							unit=self.unit,
 							abbr=self.abbr,
-							source=self.source)
+							source=self.source,
+							name_source=self.name_source)
 
 		elif self.__type_test(other):
 
@@ -261,7 +272,8 @@ class Nutrient(object):
 							value=self.value // other,
 							unit=self.unit,
 							abbr=self.abbr,
-							source=self.source)
+							source=self.source,
+							name_source=self.name_source)
 
 		elif self.__type_test(other):
 
@@ -302,7 +314,8 @@ class Nutrient(object):
 							value=self.value % other,
 							unit=self.unit,
 							abbr=self.abbr,
-							source=self.source)
+							source=self.source,
+							name_source=self.name_source)
 
 		elif self.__type_test(other):
 
