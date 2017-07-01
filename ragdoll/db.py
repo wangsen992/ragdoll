@@ -1,30 +1,15 @@
 """
 A simple draft for experimenting with a database construction.
 """
-
+import os
 import pymongo
 import bson
 import pandas as pd
 
 from .composite import *
 
-# Script initiation with nutrient dicitonary
-dict_file = "ragdoll/NUTR_DEF_CUS.txt"
-col_names = ['code', 'unit', 'abbr', 'name', 'prec', 'sort']
-with open(dict_file, 'rb') as fout:
-    lines = fout.readlines()
-    data = [line.decode(encoding="cp1252")[1:-3]
-            .split("~^~") for line in lines]
-nutrient_dict = pd.DataFrame(data, columns=col_names)
-
-# Foodmate dict
-fm_dict_file = "ragdoll/NUTR_DEF_FM.txt"
-col_names = ['code', 'unit', 'abbr', 'name']
-with open(fm_dict_file, 'rb') as fout:
-    lines = fout.readlines()
-    data = [line.decode(encoding="utf-8")[:-1]
-            .split("~^~") for line in lines]
-fm_nutrient_dict = pd.DataFrame(data, columns=col_names)
+nut_dict_file = "{root}/ragdoll/NUTR_DEF_more.csv".format(root=os.getcwd())
+nut_dict_df = pd.read_csv(nut_dict_file)
 
 
 # Implementing an adapter
@@ -151,12 +136,16 @@ class RetrieveItemVisitor(Visitor):
 
         def __nutrient_constructor(nut_doc):
 
-            code = nut_doc['code']
+            
             name = nut_doc['name']
             value = nut_doc['value']
             unit = nut_doc['units']
-            abbr = nutrient_dict[nutrient_dict['code'] == code]['abbr']\
-                   .values[0]
+
+            condition = (nut_dict_df["name_{}".format(usda_node.col_name)] == name) \
+                        & (nut_dict_df["unit_{}".format(usda_node.col_name)] == unit)
+            nut_info = nut_dict_df[condition]
+            code = nut_info['code'].values[0]
+            abbr = nut_info['abbr'].values[0]
 
             return Nutrient(name=name, 
                             value=value, 
@@ -185,7 +174,7 @@ class RetrieveItemVisitor(Visitor):
             for nutrient in ing_doc['nutrients'].items():
                 nutrient_list.append(__nutrient_constructor(nutrient))
 
-            nutrients = Nutrients(source=name, input_nutrients=nutrient_list)
+            nutrients = Nutrients(input_nutrients=nutrient_list)
 
             ingredient =  IngredientComponent(name=name,
                                               value=value,
@@ -202,10 +191,14 @@ class RetrieveItemVisitor(Visitor):
 
         def __nutrient_constructor(nut_doc):
 
-            name = nut_doc[0].split('(')[0]
+            name, unit = nut_doc[0].split('(')
+            unit = unit[:-1]
             value = nut_doc[1]
-            unit = fm_nutrient_dict[fm_nutrient_dict['name']==name]['unit'].values[0]
-            abbr = fm_nutrient_dict[fm_nutrient_dict['name']==name]['abbr'].values[0]
+            condition = (nut_dict_df["name_{}".format(fm_node.col_name)] == name) \
+                        & (nut_dict_df["unit_{}".format(fm_node.col_name)] == unit)
+            nut_info = nut_dict_df[condition]
+            code = nut_info['code'].values[0]
+            abbr = nut_info['abbr'].values[0]
 
 
             return Nutrient(name=name, 
