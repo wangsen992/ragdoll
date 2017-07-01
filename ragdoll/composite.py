@@ -13,8 +13,16 @@ should be abstracted with plus and minus signs for simple manipulation.
 By separating the nutrients and the ingredients, it is possible for future
 extension with more databases. 
 """
+import pandas as pd
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
+ 
+
+# format string used for representation of things
+title_format_str = "{abbr:<10s} {value:<10} {unit:<10s} {name:<15s}\n"
+entry_format_str = "{abbr:<10s} {value:<10.2f} {unit:<10s} {name:<15s}\n"
+recipe_title_format_str = "{index:<5} {value:<10} {unit:<5s} {db:10s} {name: <20s}\n"
+recipe_entry_format_str = "{index:<5} {value:<10.1f} {unit:<5s} {db:10s} {name: <20s}\n"
 
 class Nutrient(object):
 	"""A basic concrete class for handling nutrient-level operations.
@@ -30,7 +38,7 @@ class Nutrient(object):
 	  support required.
 	"""
 
-	def __init__(self, name, value, unit, abbr):
+	def __init__(self, name, value, unit, abbr, source=None):
 		"""Initiation of Nutrient object.
 
 		Note
@@ -56,6 +64,9 @@ class Nutrient(object):
 		self.value = value
 		self.unit = unit
 		self.abbr = abbr
+		self.source = set()
+		if source:
+			self.source.add(source)
 
 
 	def __add__(self, other):
@@ -79,10 +90,14 @@ class Nutrient(object):
 
 		assert self.__type_test(other), "Type mismatch between two nutrient objects."
 
+		source = self.source.copy()
+		source.update(other.source)
+
 		return Nutrient(name=self.name,
 						value=self.value + other.value,
 						unit=self.unit,
-						abbr=self.abbr)
+						abbr=self.abbr,
+						source=source)
 
 	def __sub__(self, other):
 		"""Subtraction of another Nutrient object.
@@ -110,10 +125,15 @@ class Nutrient(object):
 
 		assert (self.value >= other.value), "First nutrient value smaller than the second."
 
+		source = self.source.copy()
+		source.update(other.source)
+
+
 		return Nutrient(name=self.name,
 						value=self.value - other.value,
 						unit=self.unit,
-						abbr=self.abbr)
+						abbr=self.abbr,
+						source=source)
 
 	def __mul__(self, scalar):
 		"""Multiplication with a scalar.
@@ -143,7 +163,8 @@ class Nutrient(object):
 		return Nutrient(name=self.name,
 						value=self.value * scalar,
 						unit=self.unit,
-						abbr=self.abbr)
+						abbr=self.abbr,
+						source=self.source)
 
 	def __rmul__(self, scalar):
 		"""Reverse multiplication. 
@@ -196,7 +217,8 @@ class Nutrient(object):
 			return Nutrient(name=self.name,
 							value=self.value / other,
 							unit=self.unit,
-							abbr=self.abbr)
+							abbr=self.abbr,
+							source=self.source)
 
 		elif self.__type_test(other):
 
@@ -238,7 +260,8 @@ class Nutrient(object):
 			return Nutrient(name=self.name,
 							value=self.value // other,
 							unit=self.unit,
-							abbr=self.abbr)
+							abbr=self.abbr,
+							source=self.source)
 
 		elif self.__type_test(other):
 
@@ -278,7 +301,8 @@ class Nutrient(object):
 			return Nutrient(name=self.name,
 							value=self.value % other,
 							unit=self.unit,
-							abbr=self.abbr)
+							abbr=self.abbr,
+							source=self.source)
 
 		elif self.__type_test(other):
 
@@ -413,17 +437,20 @@ class Nutrient(object):
 
 			return self.value > other.value
 
+	# Functions for emulating container types.
+
 	def __repr__(self):
 		"""The representation of objects of Nutrient class."""
 
-		format_string = "name  : {name}\n" + \
-						"value : {value:.3f}\n" + \
-						"unit  : {unit}\n" + \
-						"abbr  : {abbr}\n\n"
-		return format_string.format(name=self.name,
-									value=self.value,
-									unit=self.unit,
-									abbr=self.abbr)
+		title_str = title_format_str.format(abbr='ABBR',
+										    name='NAME',
+										    value='VALUE',
+										    unit='UNIT')
+		entry_str = entry_format_str.format(abbr=self.abbr,
+										    name=self.name,
+										    value=self.value,
+										    unit=self.unit)
+		return title_str + entry_str
 
 	def __type_test(self, other):
 		"""Internal method to testing compatibility.
@@ -503,7 +530,7 @@ class Nutrients(object):
 
 	"""
 
-	def __init__(self, source="unknown", input_nutrients=list()):
+	def __init__(self, input_nutrients=list()):
 		"""Initiation of Nutrient object
 
 		Initialization requires type and format check on the nutrient objects
@@ -512,22 +539,18 @@ class Nutrients(object):
 
 		Parameters
 		----------
-		source : str
-			The source name of the Nutrients, typically the name of ingredient
-			containing the Nutrients object.
 		input_nutrients : list
 			A list of children (IngredientComponent or MealComponent) to be
 			included at the initialization of the Nutrients object.
 
 		"""
 
-		self.source = source
-		self.nutrients = dict()
-		self.__add_nutrients(*input_nutrients)
+		self.nutrients = OrderedDict()
+		self.__add_nutrients(input_nutrients)
 
 		
 
-	def __add_nutrients(self, *nutrients):
+	def __add_nutrients(self, nutrients):
 		"""Insert nutrients into the Nutrients object.
 
 		Note
@@ -542,7 +565,13 @@ class Nutrients(object):
 			Nutrient object or a list of Nutrient objects to be added.
 		
 		"""
+		if type(nutrients) not in [Nutrient, list]:
 
+			raise TypeError("Input type must be Nutrient or list.")
+
+		if type(nutrients) == Nutrient:
+
+			nutrients = list(nutrients)
 
 		for nutrient in nutrients:
 
@@ -641,8 +670,7 @@ class Nutrients(object):
 
 				newNutrients_dict[abbr] = self.nutrients[abbr] + other.nutrients[abbr]
 
-		return Nutrients(source=self.source + "+" + other.source,
-						 input_nutrients=list(newNutrients_dict.values()))
+		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
 
 	def __add__(self, other):
 		"""Wrapper function of self.add for operation overloading on "+". """
@@ -707,8 +735,7 @@ class Nutrients(object):
 
 				newNutrients_dict[abbr] = self.nutrients[abbr] - other.nutrients[abbr]
 
-		return Nutrients(source=self.source + "-" + other.source,
-						 input_nutrients=list(newNutrients_dict.values()))
+		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
 
 	def __sub__(self, other):
 		"""Wrapper function of self.sub for operation overloading on "-". """
@@ -747,15 +774,14 @@ class Nutrients(object):
 
 			newNutrients_dict[abbr] = self.nutrients[abbr] * scalar
 
-		return Nutrients(source=self.source + "*" + str(scalar),
-						 input_nutrients=list(newNutrients_dict.values()))
+		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
 
 	def __rmul__(self, scalar):
 		"""Wrapper function of self.__mul__ for operation overloading on "*"."""
 
 		return self.__mul__(scalar)
 
-	def __truediv__(self, scalar):
+	def __truediv__(self, other, method='intersect'):
 		"""Division of a scalar.
 
 		Note
@@ -775,27 +801,92 @@ class Nutrients(object):
 
 		"""
 
-		if type(scalar) not in [int, float]:
-			raise ValueError("Must be multiplied with a scalar.")
-
-		assert (scalar > 0), "Scalar must be larger than zero!"
+		if type(other) not in [int, float, Nutrients]:
+			raise ValueError("Must be multiplied with a scalar or a Nutrients object.")
 
 		newNutrients_dict = dict()
 
-		for abbr in self.nutrients.keys():
+		if type(other) in [int, float]:
 
-			newNutrients_dict[abbr] = self.nutrients[abbr] / scalar
+			assert (other > 0), "Scalar must be larger than zero!"
 
-		return Nutrients(source=self.source + "/" + str(scalar),
-						 input_nutrients=list(newNutrients_dict.values()))
+			for abbr in self.nutrients.keys():
+
+				newNutrients_dict[abbr] = self.nutrients[abbr] / other
+
+		else:
+
+			if method == 'intersect':
+				for abbr in self.keys() & other.keys():
+					newNutrients_dict[abbr] = self[abbr] / other[abbr]
+			elif method == 'union':
+				raise ValueError("union can't be performed.")
+
+		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
+
+	# Emulating container type behaviors
+	def __len__(self):
+
+		return len(self.nutrients)
+
+	def __getitem__(self, key):
+
+		if type(key) not in [str, list]:
+
+			raise TypeError("Indexing must come with either str or list type.")
+
+		if type(key) == str:
+
+			key = [key, ]
+
+		return Nutrients(input_nutrients=[self.nutrients[k] for k in key])
+
+	def __delitem__(self, key):
+
+		if type(key) not in [str, list]:
+
+			raise TypeError("Indexing must come with either str or list type.")
+
+		if type(key) == str:
+
+			key = [key, ]
+
+		for k in key:
+			del self.nutrients[k]
+
+	def __iter__(self):
+
+		return self.nutrients.__iter__()
+
+	def items(self):
+
+		for key in self.nutrients:
+
+			yield(key, self.nutrients[key])
+
+	def keys(self):
+
+		return self.nutrients.keys()
+
+	def values(self):
+
+		return self.nutrients.values()
 
 
 	def __repr__(self):
 		"""Representation of Nutrients object."""
+		title_str = title_format_str.format(abbr='ABBR',
+										    name='NAME',
+										    value='VALUE',
+										    unit='UNIT')
 
-		return "Source : {}\n".format(self.source) +\
-			   "Number of nutrients : {}\n".format(len(self.nutrients)) +\
-			   ''.join([nut.__repr__() for nut in self.nutrients.values()])
+		entry_str = "".join([entry_format_str.format(abbr=nut.abbr,
+												     name=nut.name,
+												     value=nut.value,
+												     unit=nut.unit) 
+							 for nut in self.nutrients.values()])
+
+		return title_str + entry_str
 
 
 # Composite class for ingredients and meals
@@ -807,8 +898,8 @@ class Component(object):
 		self.name = name
 		self.value = 0
 		self.unit = 'g'
-		self.children = list()
-		self.nutrients = Nutrients(source=name)
+		self.children = OrderedDict()
+		self.nutrients = Nutrients()
 		self.meta = dict()
 
 
@@ -834,7 +925,7 @@ class Component(object):
 
 	def insert_meta(self, key, value):
 
-		pass
+		self.meta[key] = value
 
 	def list_nutrients(self):
 
@@ -842,10 +933,19 @@ class Component(object):
 
 	def display_macro(self):
 
-		macro_nut_abbr = ['ENERC_KCAL','PROCNT', 'FAT', 'CHOCDF']
-
-		for key in macro_nut_abbr:
-			print(self.nutrients.nutrients[key])
+		# macro_nut_abbr = ['ENERC_KCAL','PROCNT', 'FAT', 'CHOCDF']
+		# title_str = title_format_str.format(abbr='ABBR',
+		# 								    name='NAME',
+		# 								    value='VALUE',
+		# 								    unit='UNIT')
+		# entry_str = ''.join([entry_format_str.foramt(abbr=nut[key].abbr,
+		# 											 name=nut[key].name,
+		# 											 value=nut[key].value,
+		# 											 unit=nut[key].unit)
+		# 				     for nut in 
+		# for key in macro_nut_abbr:
+		# 	print(self.nutrients.nutrients[key])
+		pass
 
 	def display_minerals(self):
 
@@ -923,6 +1023,42 @@ class IngredientComponent(Component):
 								   unit=self.unit,
 								   nutrients=self.nutrients / scalar,
 								   meta=self.meta)
+	def __len__(self):
+
+		return len(self.nutrients)
+
+	def __getitem__(self, key):
+
+		return IngredientComponent(name=self.name,
+								   value=self.value,
+								   nutrients=self.nutrients[key],
+								   unit=self.unit,
+								   meta=self.meta
+								   )
+	def __delitem__(self, key):
+
+			del self.nutrients[key]
+
+
+	def __iter__(self):
+
+		return self.nutrients.__iter__()
+
+	def items(self):
+
+		for key in self.nutrients:
+
+			yield(key, self.nutrients[key])
+
+	def keys(self):
+
+		return self.nutrients.keys()
+
+	def values(self):
+
+		return self.nutrients.values()
+
+
 
 	def __repr__(self):
 
@@ -932,12 +1068,6 @@ class IngredientComponent(Component):
 			   "Nutrients: \n" +\
 			   self.nutrients.__repr__()
 
-	def insert_meta(self, key, value):
-
-		self.meta[key] = value
-
-
-		
 
 class BasketComponent(Component):
 
@@ -945,36 +1075,59 @@ class BasketComponent(Component):
 
 		Component.__init__(self, name)
 		self.unit = unit
-		self.children = children
-		self.compute_value()
-		self.compute_nutrition()
+		self.add_children(children)
+
+	def add_children(self, children):
+		"""Insert ingredients into the Basket object.
+
+		Note
+		----
+		As the number of children is not certain, asterisk (*) is added for 
+		the function to be able to handle both single, double entry or entry 
+		as a list. 
+		
+		Parameters
+		----------
+		*children : Nutrient or list of Nutrient objects
+			Nutrient object or a list of Nutrient objects to be added.
+		
+		"""
+
+		if type(children) not in [IngredientComponent, MealComponent, list]:
+
+			raise TypeError("Input type must be in IngredientComponent, MealComponent or list")
+
+		if type(children) != list:
+
+			children = list(children)
+
+		for child in children:
+
+			if child.name in self.children:
+				# Cumulate child values if there is existing object
+				# of the same type.
+
+				self.children[child.name] = self.children[child.name] + child
+			else:
+				# Add Nutrient to collection if no existing Nutrient object
+				# of the same type. 
+				self.children[child.name] = child
+
+		self.update_attr()
 
 	def compute_nutrition(self):
 		"Intersect addition is used implicitly."
 
-		self.nutrients = sum([child.nutrients for child in self.children])
+		self.nutrients = sum([child.nutrients for child in self.children.values()])
 
 	def compute_value(self):
 
-		self.value = sum([child.value for child in self.children])
+		self.value = sum([child.value for child in self.children.values()])
 
 	def update_attr(self):
 
 		self.compute_nutrition()
 		self.compute_value()
-
-	def insert_child(self, child):
-		"""
-		Support only single entry now, types include IngredientComponent, 
-		MealComponent.
-		"""
-		# Verify the type of the child
-		if type(child) not in [IngredientComponent, MealComponent]:
-			raise TypeError("Inserted child must be either IngredientComponent "+\
-							"or MealComponent.")
-
-		self.children.append(child)
-		self.update_attr()
 
 	def remove_child(self, index):
 		"""Remove child with index, no regret here."""
@@ -993,15 +1146,15 @@ class BasketComponent(Component):
 
 		if type(other) == IngredientComponent:
 			return BasketComponent(name='MyBasket',
-								   children=[*self.children, other])
+								   children=[*self.children.values(), other])
 
 		elif type(other) == BasketComponent:
 			return BasketComponent(name='MyBasket',
-								   children=[*self.children, *other.children])
+								   children=[*self.children.values(), *other.children.values()])
 
 		elif type(other) == MealComponent:
 			return BasketComponent(name='MyBasket',
-								   children=[*self.children, other])
+								   children=[*self.children.values(), other])
 
 	def __add__(self, other):
 
@@ -1039,6 +1192,56 @@ class BasketComponent(Component):
 		return BasketComponent(name=self.name,
 							   children=children)
 
+	def __len__(self):
+
+		return len(self.children)
+
+	def __getitem__(self, key):
+
+
+		if type(key) not in [str, list]:
+
+			raise TypeError("Input key must be str or list.")
+
+		if type(key) == str:
+
+
+			return self.children[key]
+
+		else:
+
+
+			return BasketComponent(name=self.name,
+								   unit=self.unit,
+								   children=[self.children[k] for k in key]
+								   )
+
+	def __delitem__(self, key):
+
+			del self.children[key]
+			self.update_attr()
+
+
+	def __iter__(self):
+
+		return self.children.__iter__()
+
+	def items(self):
+
+		for key in self.children:
+
+			yield(key, self.children[key])
+
+	def keys(self):
+
+		return self.children.keys()
+
+	def values(self):
+
+		return self.children.values()
+
+
+
 	def convert2ingre(self, name):
 
 		return IngredientComponent(name, 
@@ -1052,8 +1255,32 @@ class BasketComponent(Component):
 		"This should be the only way to create a MealComponent object."
 
 		return MealComponent(name=name,
-							 children=self.children,
+							 children=list(self.children.values()),
 							 unit=self.unit)
+	def __repr__(self):
+
+		name_str = "Name: {name}\n".format(name=self.name)
+		value_str = "Value: {value} {unit}\n".format(value=self.value,
+												   unit=self.unit)
+		recipe_title_str = recipe_title_format_str.format(index="INDEX",
+														  name="NAME",
+														  value="VALUE",
+														  unit="UNIT",
+														  db="COLLECTION"
+														  )
+
+		recipe_entry_str = ''.join([recipe_title_format_str.format(index=i,
+													 	   name=child.name,
+													       value=child.value,
+													       unit=child.unit,
+													       db=child.meta['collection']
+													      )
+							for i, child in enumerate(self.children.values())])
+
+		return name_str + value_str + recipe_title_str \
+			   + recipe_entry_str + '\n' + self.nutrients.__repr__()
+
+
 
 
 class MealComponent(BasketComponent):
@@ -1061,70 +1288,46 @@ class MealComponent(BasketComponent):
 	def __init__(self, 
 				 name, 
 				 children,
-				 unit='g'
+				 unit='g',
+				 meta=dict()
 				 ):
 
 		BasketComponent.__init__(self, name, children, unit)
-		self.compute_value()
-		self.compute_nutrition()
+		self.meta = meta
+
+	def __getitem__(self, key):
 
 
-	def __repr__(self):
+		if type(key) not in [str, list]:
 
-		return "Meal \n" +\
-			   "Name : {}\n".format(self.name) +\
-			   "Value : {} {}\n".format(self.value, self.unit) +\
-			   "Children \n{}\n".format([child.name for child in self.children]) +\
-			   "Nutrients: \n" +\
-			   self.nutrients.__repr__()
+			raise TypeError("Input key must be str or list.")
 
-	def insert_meta(self, key, value):
+		if type(key) == str:
 
-		self.meta[key] = value
+			return self.children[key]
+
+		else:
+			sub_meal = BasketComponent.__getitem__(self, key)
+			return MealComponent(name=self.name,
+								 children=list(sub_meal.children.values()),
+								 unit=self.unit,
+								 meta=self.meta)
 
 
 
-if __name__ == '__main__':
-	
-	# Test the behaviours of Nutrient
-	protein = Nutrient(name='protein',
-					   value=100,
-					   unit='g',
-					   abbr='prot')
-	carbs = Nutrient(name='carbohydrate',
-					 value=100,
-					 unit='g',
-					 abbr='cab')
-	fat = Nutrient(name='fat',
-				   value=100,
-				   unit='g',
-				   abbr='fat')
-	print(protein)
-	print(protein + protein * 0.5)
+	def to_dict(self):
 
-	# Test the behaviours of Nutrients
-	Nut1 = Nutrients(source="Nut 1", input_nutrients=[protein, carbs, fat])
-	print(Nut1)
-	Nut2 = Nutrients(source="Nut 2", input_nutrients=[protein * 0.3, 
-												  carbs * 1.5,
-												  fat * 1.0,
-												  carbs * 1.3])
-	print(Nut2)
+		out_dict = dict()
 
-	Nut3 = Nut1 + Nut2
+		out_dict['name'] = self.name
+		out_dict['value'] = self.value
+		out_dict['unit'] = self.unit
+		out_dict['materials'] = [{'name': child.name,
+								  'cook_amt' : child.value,
+								  'meta' : child.meta} for child in self.children.values()]
 
-	print(Nut3)
+		return out_dict
 
-	# Test the construction of Ingredient
-	ingre1 = IngredientComponent(name='test_ingre', value=100, unit='g', nutrients=Nut1)
-	print(ingre1)
-
-	ingre2 = IngredientComponent(name='test_ingre2', value=100, unit='g', nutrients=Nut2)
-	print(ingre2)
-	meal = MealComponent(name='test_meal', children=[ingre1, ingre2])
-	print(meal)
-
-	meal2 = MealComponent(name='compound_meal', children=[ingre2, meal])
 
 
 
