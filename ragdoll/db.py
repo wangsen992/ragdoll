@@ -154,11 +154,15 @@ class RetrieveItemVisitor(Visitor):
             code = nut_doc['code']
             name = nut_doc['name']
             value = nut_doc['value']
-            unit = nut_doc['unit']
+            unit = nut_doc['units']
             abbr = nutrient_dict[nutrient_dict['code'] == code]['abbr']\
                    .values[0]
 
-            return Nutrient(name=name, value=value, unit=unit, abbr=abbr)
+            return Nutrient(name=name, 
+                            value=value, 
+                            unit=unit, 
+                            abbr=abbr,
+                            source=usda_node.col_name)
 
         collection = usda_node.mongod.database[usda_node.col_name]
         doc = collection.find_one({'_id': bson.objectid.ObjectId(usda_node.id)})
@@ -203,7 +207,11 @@ class RetrieveItemVisitor(Visitor):
             abbr = fm_nutrient_dict[fm_nutrient_dict['name']==name]['abbr'].values[0]
 
 
-            return Nutrient(name=name, value=value, unit=unit, abbr=abbr)
+            return Nutrient(name=name, 
+                            value=value, 
+                            unit=unit, 
+                            abbr=abbr,
+                            source=fm_node.col_name)
 
         collection = fm_node.mongod.database[fm_node.col_name]
         doc = collection.find_one({'_id': bson.objectid.ObjectId(fm_node.id)})
@@ -219,11 +227,10 @@ class RetrieveItemVisitor(Visitor):
             children = list()
 
             for ingre in meal_doc['materials']:
-                child = DiyNode.mongod.retrieve_item("Foodmate", str(ingre['ingredient_index']))
-                print([child.meta['item_id'] for child in children])
+                child = DiyNode.mongod.retrieve_item(ingre['meta']['collection'], 
+                                                     ingre['meta']['item_id'])
                 newchild = child / 100 * ingre['cook_amt']
                 children.append(newchild)
-                print([child.meta['item_id'] for child in children])
             
             meal = MealComponent(name=name,
                                  children=children)
