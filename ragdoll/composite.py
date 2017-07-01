@@ -591,7 +591,8 @@ class Nutrients(object):
 			if nutrient.abbr in self.nutrients:
 				# Cumulate nutrient values if there is existing Nutrient object
 				# of the same type.
-
+				print(nutrient)
+				print(self.nutrients[nutrient.abbr])
 				assert self.nutrients[nutrient.abbr]._Nutrient__type_test(nutrient), "Nutrient not compatible with existing nutrient"
 				self.nutrients[nutrient.abbr] = self.nutrients[nutrient.abbr] + nutrient
 			else:
