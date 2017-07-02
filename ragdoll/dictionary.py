@@ -57,7 +57,7 @@ class NutrientDictionary(Dictionary):
 	def __init__(self, dict_file=nut_dict_file):
 
 		self.dict_file = dict_file
-		self.dict_df = pd.read_csv(self.dict_file)
+		self.dict_df = pd.read_csv(self.dict_file, keep_default_na=False)
 
 	def translate(self, nutrient, target):
 		"""translate current nutrient to target format

@@ -4,12 +4,13 @@ A simple draft for experimenting with a database construction.
 import os
 import pymongo
 import bson
+import numpy as np
 import pandas as pd
 
 from .composite import *
 
 nut_dict_file = "{root}/ragdoll/NUTR_DEF_more.csv".format(root=os.getcwd())
-nut_dict_df = pd.read_csv(nut_dict_file)
+nut_dict_df = pd.read_csv(nut_dict_file, keep_default_na=False)
 
 
 # Implementing an adapter
@@ -107,6 +108,7 @@ class Visitor(object):
 
 class RetrieveItemVisitor(Visitor):
 
+
     def visitUsdaNode(usda_node):
 
         def __ingredient_constructor(ing_doc):
@@ -194,6 +196,9 @@ class RetrieveItemVisitor(Visitor):
             name, unit = nut_doc[0].split('(')
             unit = unit[:-1]
             value = nut_doc[1]
+            if np.isnan(value):
+                value = 0
+
             condition = (nut_dict_df["name_{}".format(fm_node.col_name)] == name) \
                         & (nut_dict_df["unit_{}".format(fm_node.col_name)] == unit)
             nut_info = nut_dict_df[condition]
@@ -218,21 +223,30 @@ class RetrieveItemVisitor(Visitor):
 
         def __meal_constructor(meal_doc):
 
+
             name = meal_doc['name']
             children = list()
+            print("current doc name : {name}".format(name=name))
+            print([ingre_doc['name'] for ingre_doc in meal_doc['materials']])
 
             for ingre in meal_doc['materials']:
+                print(ingre['name'])
+                print(ingre['meta'])
                 child = DiyNode.mongod.retrieve_item(ingre['meta']['collection'], 
                                                      ingre['meta']['item_id'])
-                newchild = child / 100 * ingre['cook_amt']
+                print("child {name} is constructed.".format(name=child.name))
+                newchild = child / child.value * ingre['cook_amt']
                 children.append(newchild)
+            print("All children are constructed.")
             
             meal = MealComponent(name=name,
                                  children=children)
+            print("Meal {name} is constructed.".format(name=meal.name))
 
             # insert meta information about database
             meal.insert_meta("collection", DiyNode.col_name)
             meal.insert_meta("item_id", str(meal_doc["_id"]))
+
 
             return meal
 
@@ -241,7 +255,6 @@ class RetrieveItemVisitor(Visitor):
         doc = collection.find_one({"_id" : bson.objectid.ObjectId(DiyNode.id)})
 
         return __meal_constructor(doc)
-
 
 
 
@@ -283,21 +296,7 @@ class InsertItemVisitor(Visitor):
         # Decompose a meal into reasonable format according to DIY format
         meal = DiyNode.component
 
-        # get name
-        out_dict = dict()
-        out_dict['name'] = meal.name
-
-        out_dict['materials'] = []
-
-        for child in meal.children:
-
-            ingre_dict = {"name" : child.name,
-                          "cook_amt" : child.value,
-                          "ingredient_index" : bson.objectid.ObjectId(child.metanew["item_id"])}
-            out_dict['materials'].append(ingre_dict)
-
-        # Insert to DIY
-        result = DiyNode.mongod.database[DiyNode.col_name].insert_one(out_dict)
+        result = DiyNode.mongod.database[DiyNode.col_name].insert_one(meal.to_dict())
         print(result)
 
 

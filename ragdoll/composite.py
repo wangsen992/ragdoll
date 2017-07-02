@@ -72,8 +72,10 @@ class Nutrient(object):
 		self.abbr = abbr
 		self.name_source=name_source
 		self.source = set()
-		if source:
+		if type(source) == str:
 			self.source.add(source)
+		elif type(source) == set:
+			self.source.update(source)
 
 
 	def __add__(self, other):
@@ -233,7 +235,12 @@ class Nutrient(object):
 
 		elif self.__type_test(other):
 
-			return self.value / other.value
+			return Nutrient(name=self.name,
+							value=self.value / other.value,
+							unit=self.unit,
+							abbr=self.abbr,
+							source=self.source,
+							name_source=self.name_source)
 
 		else:
 			raise TypeError("Must be divided with a scalar or Nutrient object of the same type.")
@@ -494,10 +501,18 @@ class Nutrient(object):
 			return False
 
 		elif self.abbr != other.abbr:
+			print(self.name)
+			print(self.abbr)
+			print(other.name)
+			print(other.abbr)
 			raise ValueError("Abbreviations not the same.")
 			return False
 
 		elif self.unit != other.unit:
+			print(self.name)
+			print(self.unit)
+			print(other.name)
+			print(other.unit)
 			raise ValueError("Unit types not the same.")
 			return False
 
@@ -559,11 +574,11 @@ class Nutrients(object):
 		"""
 
 		self.nutrients = OrderedDict()
-		self.__add_nutrients(input_nutrients)
+		self.add_nutrients(input_nutrients)
 
 		
 
-	def __add_nutrients(self, nutrients):
+	def add_nutrients(self, nutrients):
 		"""Insert nutrients into the Nutrients object.
 
 		Note
@@ -584,15 +599,13 @@ class Nutrients(object):
 
 		if type(nutrients) == Nutrient:
 
-			nutrients = list(nutrients)
+			nutrients = [nutrients, ]
 
 		for nutrient in nutrients:
 
 			if nutrient.abbr in self.nutrients:
 				# Cumulate nutrient values if there is existing Nutrient object
 				# of the same type.
-				print(nutrient)
-				print(self.nutrients[nutrient.abbr])
 				assert self.nutrients[nutrient.abbr]._Nutrient__type_test(nutrient), "Nutrient not compatible with existing nutrient"
 				self.nutrients[nutrient.abbr] = self.nutrients[nutrient.abbr] + nutrient
 			else:
@@ -832,7 +845,7 @@ class Nutrients(object):
 
 			if method == 'intersect':
 				for abbr in self.keys() & other.keys():
-					newNutrients_dict[abbr] = self[abbr] / other[abbr]
+					newNutrients_dict[abbr] = self.nutrients[abbr] / other.nutrients[abbr]
 			elif method == 'union':
 				raise ValueError("union can't be performed.")
 
@@ -989,12 +1002,21 @@ class IngredientComponent(Component):
 			raise TypeError("Second argument not a sub-Component object")
 
 		if type(other) == IngredientComponent:
-			return BasketComponent(name='MyBasket',
-								   children=[self, other])
+			if self.name == other.name and self.unit == other.unit:
+
+				return IngredientComponent(name=self.name,
+										   value=self.value+other.value,
+										   nutrients=self.nutrients+other.nutrients,
+										   unit=self.unit,
+										   meta=self.meta)
+			else:
+
+				return BasketComponent(name='MyBasket',
+									   children=[self, other])
 
 		elif type(other) == BasketComponent:
 			return BasketComponent(name='MyBasket',
-								   children=[self, *other.children])
+								   children=[self, *other.children.values()])
 
 		elif type(other) == MealComponent:
 			return BasketComponent(name='MyBasket',
@@ -1083,6 +1105,21 @@ class IngredientComponent(Component):
 			   self.nutrients.__repr__()
 
 
+def flatten(AggComponent):
+	"Helper function for flattening BasketComponent and MealComponent."
+
+	children = []
+
+	if len(AggComponent.children) == 0:
+		children.append(AggComponent)
+
+	else:
+		for child in AggComponent.children.values():
+			children.extend(flatten(child))
+
+	return children
+
+
 class BasketComponent(Component):
 
 	def __init__(self, name, children=list(), unit='g'):
@@ -1113,14 +1150,13 @@ class BasketComponent(Component):
 
 		if type(children) != list:
 
-			children = list(children)
+			children = [children, ]
 
 		for child in children:
 
 			if child.name in self.children:
 				# Cumulate child values if there is existing object
 				# of the same type.
-
 				self.children[child.name] = self.children[child.name] + child
 			else:
 				# Add Nutrient to collection if no existing Nutrient object
@@ -1185,7 +1221,7 @@ class BasketComponent(Component):
 
 		assert (scalar >= 0), "Scalar must be equal or larger than zero!"
 
-		children = [child * scalar for child in self.children]
+		children = [child * scalar for child in self.children.values()]
 
 		return BasketComponent(name=self.name,
 							   children=children)
@@ -1201,7 +1237,7 @@ class BasketComponent(Component):
 
 		assert (scalar > 0), "Scalar must be larger than zero!"
 
-		children = [child / scalar for child in self.children]
+		children = [child / scalar for child in self.children.values()]
 
 		return BasketComponent(name=self.name,
 							   children=children)
@@ -1253,7 +1289,6 @@ class BasketComponent(Component):
 	def values(self):
 
 		return self.children.values()
-
 
 
 	def convert2ingre(self, name):
@@ -1309,6 +1344,59 @@ class MealComponent(BasketComponent):
 		BasketComponent.__init__(self, name, children, unit)
 		self.meta = meta
 
+	def add(self, other):
+
+		"Only for ingredient-ingredient summation for now"
+		if not issubclass(type(other), Component) :
+			raise TypeError("Second argument not a sub-Component object")
+
+		if type(other) == IngredientComponent:
+			return BasketComponent(name='MyBasket',
+								   children=[self, other])
+
+		elif type(other) == BasketComponent:
+			return BasketComponent(name='MyBasket',
+								   children=[self, *other.children.values()])
+
+		elif type(other) == MealComponent:
+			return BasketComponent(name='MyBasket',
+								   children=[self, other])
+	def __sub__(self, other):
+
+		pass
+
+	def __mul__(self, scalar):
+		
+		if type(scalar) not in [int, float]:
+			raise ValueError("Must be multiplied with a scalar.")
+
+		assert (scalar >= 0), "Scalar must be equal or larger than zero!"
+
+		children = [child * scalar for child in self.children.values()]
+
+		return MealComponent(name=self.name,
+							   children=children)
+
+	def __rmul__(self, scalar):
+
+		return self.__mul__(scalar)
+
+	def __truediv__(self, scalar):
+
+		if type(scalar) not in [int, float]:
+			raise ValueError("Must be multiplied with a scalar.")
+
+		assert (scalar > 0), "Scalar must be larger than zero!"
+
+		children = [child / scalar for child in self.children.values()]
+
+		return MealComponent(name=self.name,
+							   children=children)
+
+	def __add__(self, other):
+
+		return self.add(other)
+
 	def __getitem__(self, key):
 
 
@@ -1326,6 +1414,15 @@ class MealComponent(BasketComponent):
 								 children=list(sub_meal.children.values()),
 								 unit=self.unit,
 								 meta=self.meta)
+
+	def flatten(self):
+
+		children = flatten(self)
+
+		return MealComponent(name=self.name,
+							 children=children,
+							 unit=self.unit,
+							 meta=self.meta)
 
 
 

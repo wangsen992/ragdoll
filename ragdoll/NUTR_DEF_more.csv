@@ -1,0 +1,151 @@
+code,abbr,name_USDA,unit_USDA,name_Zh,unit_Zh,name_Foodmate,unit_Foodmate,prec,sort
+203,PROCNT,Protein,g,蛋白质,克,蛋白质,克,2,600
+204,FAT,Total lipid (fat),g,脂肪,克,脂肪,克,2,800
+205,CHOCDF,"Carbohydrate, by difference",g,碳水化合物,克,碳水化合物,克,2,1100
+207,ASH,Ash,g,无机物,克,,,2,1000
+208,ENERC_KCAL,Energy,kcal,热量,千卡,热量,千卡,0,300
+209,STARCH,Starch,g,淀粉,克,,,2,2200
+210,SUCS,Sucrose,g,蔗糖,克,,,2,1600
+211,GLUS,Glucose (dextrose),g,葡萄糖,克,,,2,1700
+212,FRUS,Fructose,g,果糖,克,,,2,1800
+213,LACS,Lactose,g,乳糖,克,,,2,1900
+214,MALS,Maltose,g,麦芽糖,克,,,2,2000
+221,ALC,"Alcohol, ethyl",g,乙醇,克,,,1,18200
+255,WATER,Water,g,水,克,,,2,100
+257,AJPROCNT,Adjusted Protein,g,调整蛋白,克,,,2,700
+262,CAFFN,Caffeine,mg,咖啡因,毫克,,,0,18300
+263,THEBRN,Theobromine,mg,可可碱,毫克,,,0,18400
+268,ENERC_KJ,Energy,kJ,热量,千焦,,,0,400
+269,SUGAR,"Sugars, total",g,总糖,克,,,2,1500
+287,GALS,Galactose,g,半乳糖,克,,,2,2100
+291,FIBTG,"Fiber, total dietary",g,膳食纤维,克,膳食纤维,克,1,1200
+301,CA,"Calcium, Ca",mg,钙,毫克,钙,毫克,0,5300
+303,FE,"Iron, Fe",mg,铁,毫克,铁,毫克,2,5400
+304,MG,"Magnesium, Mg",mg,镁,毫克,镁,毫克,0,5500
+305,P,"Phosphorus, P",mg,磷,毫克,磷,毫克,0,5600
+306,K,"Potassium, K",mg,钾,毫克,钾,毫克,0,5700
+307,"NA","Sodium, Na",mg,钠,毫克,钠,毫克,0,5800
+309,ZN,"Zinc, Zn",mg,锌,毫克,锌,毫克,2,5900
+312,CU,"Copper, Cu",mg,铜,毫克,铜,毫克,3,6000
+313,FLD,"Fluoride, F",µg,氟,微克,,,1,6240
+315,MN,"Manganese, Mn",mg,锰,毫克,锰,毫克,3,6100
+317,SE,"Selenium, Se",µg,硒,微克,硒,微克,1,6200
+318,VITA_IU,"Vitamin A, IU",IU,维生素A,IU,维生素A,微克,0,7500
+319,RETOL,Retinol,µg,视黄醇,微克,,,0,7430
+320,VITA_RAE,"Vitamin A, RAE",µg,"维生素A, 视黄醇当量",微克,视黄醇当量,微克,0,7420
+321,CARTB,"Carotene, beta",µg,β胡罗卜素,微克,胡罗卜素,微克,0,7440
+322,CARTA,"Carotene, alpha",µg,α胡萝卜素,微克,,,0,7450
+323,TOCPHA,Vitamin E (alpha-tocopherol),mg,维生素E (α-生育酚),毫克,维生素E,毫克,2,7900
+324,VITD,Vitamin D,IU,维生素D,IU,,,0,8750
+325,ERGCAL,Vitamin D2 (ergocalciferol),µg,维生素D2（麦角钙化醇）,微克,,,1,8710
+326,CHOCAL,Vitamin D3 (cholecalciferol),µg,维生素D3（胆钙化醇）,微克,,,1,8720
+328,VITD23,Vitamin D (D2 + D3),µg,维生素D（D2 + D3）,微克,,,1,8700
+334,CRYPX,"Cryptoxanthin, beta",µg,β隐黄质,微克,,,0,7460
+337,LYCPN,Lycopene,µg,番茄红素,微克,,,0,7530
+338,LUT+ZEA,Lutein + zeaxanthin,µg,叶黄素 + 玉米黄质,微克,,,0,7560
+341,TOCPHB,"Tocopherol, beta",mg,"生育酚, β",毫克,,,2,8000
+342,TOCPHG,"Tocopherol, gamma",mg,"生育酚, γ",毫克,,,2,8100
+343,TOCPHD,"Tocopherol, delta",mg,"生育酚, δ",毫克,,,2,8200
+344,TOCTRA,"Tocotrienol, alpha",mg,"生育三烯酚, α",毫克,,,2,8300
+345,TOCTRB,"Tocotrienol, beta",mg,"生育三烯酚, β",毫克,,,2,8400
+346,TOCTRG,"Tocotrienol, gamma",mg,"生育三烯酚, γ",毫克,,,2,8500
+347,TOCTRD,"Tocotrienol, delta",mg,"生育三烯酚, δ",毫克,,,2,8600
+401,VITC,"Vitamin C, total ascorbic acid",mg,"维生素 C, 总抗坏血酸",毫克,维生素C,毫克,1,6300
+404,THIA,Thiamin,mg,硫胺素,毫克,硫胺素,毫克,3,6400
+405,RIBF,Riboflavin,mg,核黄素,毫克,核黄素,毫克,3,6500
+406,NIA,Niacin,mg,烟酸,毫克,烟酸,毫克,3,6600
+410,PANTAC,Pantothenic acid,mg,泛酸,毫克,,,3,6700
+415,VITB6A,Vitamin B-6,mg,维生素 B-6,毫克,,,3,6800
+417,FOL,"Folate, total",µg,叶酸总量,微克,,,0,6900
+418,VITB12,Vitamin B-12,µg,维生素 B-12,微克,,,2,7300
+421,CHOLN,"Choline, total",mg,胆碱总量,毫克,,,1,7220
+428,MK4,Menaquinone-4,µg,维生素 K2,微克,,,1,8950
+429,VITK1D,Dihydrophylloquinone,µg,氢化维生素 K1,微克,,,1,8900
+430,VITK1,Vitamin K (phylloquinone),µg,维生素 K (维生素 K1),微克,,,1,8800
+431,FOLAC,Folic acid,µg,叶酸,微克,,,0,7000
+432,FOLFD,"Folate, food",µg,食源性叶酸,微克,,,0,7100
+435,FOLDFE,"Folate, DFE",µg,膳食叶酸当量,微克,,,0,7200
+454,BETN,Betaine,mg,甜菜碱,毫克,,,1,7270
+501,TRP_G,Tryptophan,g,色氨酸,克,,,3,16300
+502,THR_G,Threonine,g,苏氨酸,克,,,3,16400
+503,ILE_G,Isoleucine,g,异亮氨酸,克,,,3,16500
+504,LEU_G,Leucine,g,亮氨酸,克,,,3,16600
+505,LYS_G,Lysine,g,赖氨酸,克,,,3,16700
+506,MET_G,Methionine,g,蛋氨酸,克,,,3,16800
+507,CYS_G,Cystine,g,胱氨酸,克,,,3,16900
+508,PHE_G,Phenylalanine,g,苯丙氨酸,克,,,3,17000
+509,TYR_G,Tyrosine,g,酪氨酸,克,,,3,17100
+510,VAL_G,Valine,g,缬氨酸,克,,,3,17200
+511,ARG_G,Arginine,g,精氨酸,克,,,3,17300
+512,HISTN_G,Histidine,g,组氨酸,克,,,3,17400
+513,ALA_G,Alanine,g,丙氨酸,克,,,3,17500
+514,ASP_G,Aspartic acid,g,天冬氨酸,克,,,3,17600
+515,GLU_G,Glutamic acid,g,谷氨酸,克,,,3,17700
+516,GLY_G,Glycine,g,甘氨酸,克,,,3,17800
+517,PRO_G,Proline,g,脯氨酸,克,,,3,17900
+518,SER_G,Serine,g,丝氨酸,克,,,3,18000
+521,HYP,Hydroxyproline,g,羟脯氨酸,克,,,3,18100
+573,VITEA,"Vitamin E, added",mg,另添加维生素 E,毫克,,,2,7920
+578,VITB12A,"Vitamin B-12, added",µg,另添加维生素 B-12,微克,,,2,7340
+601,CHOLE,Cholesterol,mg,胆固醇,毫克,胆固醇,毫克,0,15700
+605,FATRN,"Fatty acids, total trans",g,总反式脂肪酸,克,,,3,15400
+606,FASAT,"Fatty acids, total saturated",g,总饱和脂肪酸,克,,,3,9700
+607,F4D0,4:0,g,丁酸,克,,,3,9800
+608,F6D0,6:0,g,己酸,克,,,3,9900
+609,F8D0,8:0,g,辛酸,克,,,3,10000
+610,F10D0,10:0,g,癸酸,克,,,3,10100
+611,F12D0,12:0,g,月桂酸,克,,,3,10300
+612,F14D0,14:0,g,肉豆蔻酸,克,,,3,10500
+613,F16D0,16:0,g,棕榈酸,克,,,3,10700
+614,F18D0,18:0,g,硬脂酸,克,,,3,10900
+615,F20D0,20:0,g,花生酸,克,,,3,11100
+617,F18D1,18:1 undifferentiated,g,总油酸,克,,,3,12100
+618,F18D2,18:2 undifferentiated,g,总亚油酸,克,,,3,13100
+619,F18D3,18:3 undifferentiated,g,总亚麻酸,克,,,3,13900
+620,F20D4,20:4 undifferentiated,g,总花生四烯酸,克,,,3,14700
+621,F22D6,22:6 n-3 (DHA),g,DHA,克,,,3,15300
+624,F22D0,22:0,g,山嵛酸,克,,,3,11200
+625,F14D1,14:1,g,十四碳烯酸,克,,,3,11500
+626,F16D1,16:1 undifferentiated,g,总棕榈油酸,克,,,3,11700
+627,F18D4,18:4,g,十八碳四烯酸,克,,,3,14250
+628,F20D1,20:1,g,二十烯酸,克,,,3,12400
+629,F20D5,20:5 n-3 (EPA),g,EPA,克,,,3,15000
+630,F22D1,22:1 undifferentiated,g,总芥酸,克,,,3,12500
+631,F22D5,22:5 n-3 (DPA),g,DPA,克,,,3,15200
+636,PHYSTR,Phytosterols,mg,植物甾醇,毫克,,,0,15800
+638,STID7,Stigmasterol,mg,豆甾醇,毫克,,,0,15900
+639,CAMD5,Campesterol,mg,菜油甾醇,毫克,,,0,16000
+641,SITSTR,Beta-sitosterol,mg,β-谷甾醇,毫克,,,0,16200
+645,FAMS,"Fatty acids, total monounsaturated",g,脂肪酸，总单不饱和,克,,,3,11400
+646,FAPU,"Fatty acids, total polyunsaturated",g,脂肪酸，总多不饱和,克,,,3,12900
+652,F15D0,15:0,g,十五酸,克,,,3,10600
+653,F17D0,17:0,g,珍珠酸,克,,,3,10800
+654,F24D0,24:0,g,二十四酸,克,,,3,11300
+662,F16D1T,16:1 t,g,反棕榈酸,克,,,3,11900
+663,F18D1T,18:1 t,g,反油酸,克,,,3,12300
+664,F22D1T,22:1 t,g,反芥酸,克,,,3,12700
+665,F18D2TNF,18:2 t not further defined,g,反亚油酸,克,,,3,13800
+666,F18D2I,18:2 i,g,混合异构亚油酸,克,,,3,13700
+669,F18D2TT,"18:2 t,t",g,全反亚油酸,克,,,3,13600
+670,F18D2CLA,18:2 CLAs,g,共轭亚油酸,克,,,3,13300
+671,F24D1C,24:1 c,g,神经酸,克,,,3,12800
+672,F20D2CN6,"20:2 n-6 c,c",g,二十碳二烯酸,克,,,3,14300
+673,F16D1C,16:1 c,g,棕榈油酸,克,,,3,11800
+674,F18D1C,18:1 c,g,油酸,克,,,3,12200
+675,F18D2CN6,"18:2 n-6 c,c",g,亚油酸,克,,,3,13200
+676,F22D1C,22:1 c,g,二十二烯酸,克,,,3,12600
+685,F18D3CN6,"18:3 n-6 c,c,c",g,亚麻酸,克,,,3,14100
+687,F17D1,17:1,g,十七烯酸,克,,,3,12000
+689,F20D3,20:3 undifferentiated,g,总花生三烯酸,克,,,3,14400
+693,FATRNM,"Fatty acids, total trans-monoenoic",g,"脂肪酸, 总反式单不饱和",克,,,3,15500
+695,FATRNP,"Fatty acids, total trans-polyenoic",g,"脂肪酸, 总反式多不饱和",克,,,3,15600
+696,F13D0,13:0,g,十三酸,克,,,3,10400
+697,F15D1,15:1,g,十五烯酸,克,,,3,11600
+851,F18D3CN3,"18:3 n-3 c,c,c (ALA)",g,ALA,克,,,3,14000
+852,F20D3N3,20:3 n-3,g,Ω-3 花生三烯酸,克,,,3,14500
+853,F20D3N6,20:3 n-6,g,Ω-6 花生三烯酸,克,,,3,14600
+855,F20D4N6,20:4 n-6,g,Ω-6 花生四烯酸,克,,,3,14900
+856,F18D3I,18:3i,g,混合异构亚麻酸,克,,,3,14200
+857,F21D5,21:5,g,二十一五烯酸,克,,,3,15100
+858,F22D4,22:4,g,二十二四烯酸,克,,,3,15160
+859,F18D1TN7,18:1-11 t (18:1t n-7),g,Ω-7 反油酸,克,,,3,12310
