@@ -59,10 +59,10 @@ class Nutrient(object):
 			The abbreviation of the initiated nutrient.
 		source : str
 			The source of the nutritional information, name of the database
-			collection the information is obtained from.
+			collection the **information** is obtained from.
 		name_source : str
 			The source of the name of the nutrient, name of the database 
-			collection the name is used in. 
+			collection the **name** is used in. 
 
 		"""
 
@@ -188,6 +188,13 @@ class Nutrient(object):
 		----------
 		scalar : float or int
 			The scalar value to the multiplied with. 
+
+
+		Returns
+		-------
+		Nutrient
+			A Nutrient object of same type (name, unit, abbr), with value being
+			self.value multiplied by the scalar. 
 
 		"""
 
@@ -529,7 +536,7 @@ class Nutrients(object):
 	nutrients of the same type. The dictionary of abbreviation and nutrient
 	names are defined in a separated file, e.g. NUTR_DEF_CUS.txt.
 	
-	An important concept of operation is whether use union or intersection 
+	An important concept of operation is whether use **union** or **intersection** 
 	for algebraic operations between clusters of nutrients. 
 		* Union:
 
@@ -565,6 +572,9 @@ class Nutrients(object):
 		supplied. Therefore, the addition of nutrients can be handled by 
 		__add_nutrients method, which conducts the type and format check.
 
+		While input_nutrients are entered as list, they are transformed into
+		OrderedDict afer initiation. 
+
 		Parameters
 		----------
 		input_nutrients : list
@@ -580,12 +590,6 @@ class Nutrients(object):
 
 	def add_nutrients(self, nutrients):
 		"""Insert nutrients into the Nutrients object.
-
-		Note
-		----
-		As the number of nutrients is not certain, asterisk (*) is added for 
-		the function to be able to handle both single, double entry or entry 
-		as a list. 
 		
 		Parameters
 		----------
@@ -817,7 +821,7 @@ class Nutrients(object):
 
 		Parameters
 		----------
-		scalar : float or int
+		other : (float or int), or Nutrients
 			The scalar value to the multiplied with. 
 
 		Returns
@@ -864,7 +868,7 @@ class Nutrients(object):
 
 		if type(key) == str:
 
-			key = [key, ]
+			return self.nutrients[key]
 
 		return Nutrients(input_nutrients=[self.nutrients[k] for k in key])
 
@@ -919,6 +923,45 @@ class Nutrients(object):
 # Composite class for ingredients and meals
 
 class Component(object):
+	"""Abstract class for the composite structure
+
+	Component class serves as the base class for the composite structure
+	consisting of the IngredientComponent class[leaf], the BasketComponent 
+	class [composite] and the MealComponent class [composite].
+
+	The purpose of the composite structure is two-fold:
+		1. enables a recursive structure of the meal, assisting flexible 
+		   composition of meals.
+		2. consolidate a unified interface for all component classes towards
+		   external clients, thus clients do not need to know which component
+		   they are operating on. 
+	
+	Relationships between IngredientComponent, BasketComponent, and 
+	MealComponent: 
+		* IngredientComponent has no children, it acts as the leaf within 
+		  the recursive structure. 
+		* BasketComponet is a composite, it has children. The uniqueness about
+		  the BasketComponent from a MealComponent is that when new components 
+		  are added to a BasketComponent, those added components are always in
+		  the first level. 
+		* MealComponent is similar to a BasketComponent, but it can only be
+		  obtained by calling the .convert2meal() method on the BasketComponent.
+	
+	This relationship can be better illustrated with the equations below:
+		*. Ingredient1 + Ingredient2 = Basket1
+			*. Basket1.children consists of (Ingredient1, Ingredient2)
+		*. Ingredient3 + Ingredient4 + Ingredient5 = Basket2
+			*. Basket2.children consists of (Ingredient3, Ingredient4, Ingredient5)
+		*. Ingredient6 + Basket1 = Basket4
+			*. Basket4.children consists of (Ingredient 6, Ingredient3 to Ingredient5)
+		*. Basket1 + Basket2 = Basket3
+			*. Basket3.children consists of (Ingredient1 to Ingredient5)
+		*. Basket1.convert2meal() = Meal1
+			*. Meal1.children = Basket1.children
+		*. Basket2 + Meal1 = Basket3
+			*. Basket3.children consists of (Ingredient3 to Ingredient5, and Meal1)
+
+	"""
 
 	def __init__(self, name="unknown"):
 
@@ -987,6 +1030,25 @@ class Component(object):
 
 
 class IngredientComponent(Component):
+	"""Leaf class for the composite structure
+	
+	IngredientComponent class is the leaf class, thus it has no children. 
+	It represents an ingredient of a meal. It cannot be decomposed further
+	into other ingredients, but only into individual nutrients. 
+
+	There are two types of operations available with IngredientComponent:
+		1. Algebraic operation: with operator overloading, four operations are
+		   defined for IngredientComponent: 
+		   1. Summation
+		   2. Subtraction
+		   3. Multiplication
+		   4. Division
+
+		2. Dataframe-like Indexing: with over-riding some methods, easier 
+		   indexing operations are possible to faciliate quick retrieval of 
+		   information. 
+
+	"""
 
 	def __init__(self, name, value, nutrients, unit='g', meta=dict()):
 
@@ -997,12 +1059,48 @@ class IngredientComponent(Component):
 		self.meta = meta
 
 	def add(self, other):
+		"""Summation between two Components
+
+		Three types of components can be added to an IngredientComponent:
+
+		* IngredientComponent: 
+			*. if two IngredientComponent objects are the same, in terms of 
+			   meta infomation, the IngredientComponent is returned with 
+			   added value. 
+
+			*. if two IngredientComponent objects are not the same, in terms
+			   of meta information, a BasketComponent with children as a OrderedDict 
+			   consisting of those two Ingredient Components.
+
+		*. BasketComponent: 
+			*. If the IngredientComponent has peer in the BasketComponent (meta),
+			   this IngredientComponent will be added to that peer.
+			*. If the IngredientComponent has no peer in the BasketComponent,
+			   this IngredientComponent will be added to the children of the 
+			   BasketComponent.
+
+		*. MealComponent:
+			*. A BasketComponent is returned with children as a OrderedDict 
+			   consisting of the IngredientComponent and the MealComponent.
+
+		Parameters
+		----------
+		other: IngredientComponent or BasketComponent or MealComponent
+			The object to be added with. 
+
+		Returns
+		-------
+		IngredientComponent or BasketComponent
+			Type depends on the class of **other**.
+
+
+		"""
 
 		if not issubclass(type(other), Component) :
 			raise TypeError("Second argument not a sub-Component object")
 
 		if type(other) == IngredientComponent:
-			if self.name == other.name and self.unit == other.unit:
+			if self.meta == other.meta:
 
 				return IngredientComponent(name=self.name,
 										   value=self.value+other.value,
@@ -1022,55 +1120,169 @@ class IngredientComponent(Component):
 			return BasketComponent(name='MyBasket',
 								   children=[self, other])
 
+	def sub(self, other):
+		"""Subtraction of another IngredientComponent of same kind
+		
+		Only IngredientComponent object of the same kind (meta) can be 
+		subtracted from self. Currently, there should be enforcement on
+		self.value >= other.value.
+
+		Parameters
+		----------
+		other: IngredientComponent
+			The IngredientComponent of the same kind (meta) to be subtracted
+			with.
+
+		Returns
+		-------
+		IngredientComponent
+			An IngredientComponent of the same kind with its values being
+			self.value - other.value.
+
+		"""
+
+		if type(other) != IngredientComponent:
+			raise TypeError("Second argument must be an IngredientComponent object.")
+
+		if self.meta != other.meta:
+			raise ValueError("Two IngredientComponent objects' meta do not match.")
+
+		if self.value < other.value:
+			raise ValueError("Value of first IngredientComponent must be larger"
+							 " or equal to that of the second one.")
+
+		return IngredientComponent(name=self.name,
+								   value=self.value-other.value,
+								   nutrients=self.nutrients+other.nutrients,
+								   unit=self.unit,
+								   meta=self.meta)
+
 	def __add__(self, other):
+		"""Overloading of the + operator."""
 
 		return self.add(other)
 
 	def __sub__(self, other):
+		"""Overloading of the - operator."""
+		
+		return self.sub(other)
 
-		pass
+	def multiply(self, other):
+		"""Multiplication with a scalar
+
+		Parameters
+		----------
+		other: int or float
+			The scalar to be multiplied with. 
+
+		Returns
+		-------
+		IngredientComponent
+			An IngredientComponent of the same kind with its values being
+			self.value * other.
+
+		"""
+
+		if type(other) not in [int, float]:
+			raise ValueError("Must be multiplied with a scalar.")
+
+		assert (other >= 0), "Scalar must be equal or larger than zero!"
+
+		return IngredientComponent(name=self.name,
+								   value=self.value * other,
+								   unit=self.unit,
+								   nutrients=self.nutrients * other,
+								   meta=self.meta)
 
 	def __mul__(self, scalar):
-
-		if type(scalar) not in [int, float]:
-			raise ValueError("Must be multiplied with a scalar.")
-
-		assert (scalar >= 0), "Scalar must be equal or larger than zero!"
-
-		return IngredientComponent(name=self.name,
-								   value=self.value * scalar,
-								   unit=self.unit,
-								   nutrients=self.nutrients * scalar,
-								   meta=self.meta)
+		"""Overloading of the * operator."""
+		
+		return self.multiply(scalar)
 
 	def __rmul__(self, scalar):
+		"""Overloading of the * operation in case of reverse order"""
 
-		return self.__mul__(scalar)
+		return self.multiply(scalar)
 
-	def __truediv__(self, scalar):
+	def divide(self, other):
+		"""Division by another IngredientComponent of same kind or a scalar.
+		
+		There are two data types that can be inputted as other: 
+		*. IngredientComponent
+			Only IngredientComponent object of the same kind (meta) can divide 
+			self. Check other.value > 0. It returns a scalar with value being
+			self.value / other.value
+		*. Scalar (int or float)
+			An IngredientComponent of the same kind is returned with its value
+			being self.value / other. Check other > 0.
 
-		if type(scalar) not in [int, float]:
-			raise ValueError("Must be multiplied with a scalar.")
 
-		assert (scalar > 0), "Scalar must be larger than zero!"
+		Parameters
+		----------
+		other: IngredientComponent or (int or float)
+			The IngredientComponent of the same kind (meta) or the scalar to 
+			divide self. 
 
-		return IngredientComponent(name=self.name,
-								   value=self.value / scalar,
-								   unit=self.unit,
-								   nutrients=self.nutrients / scalar,
-								   meta=self.meta)
+		Returns
+		-------
+		(int or float) or IngredientComponent
+			Ratio between the two IngredientComponents of the same kind, or, 
+			an IngredientComponent of the same kind with its values being
+			self.value - other.
+
+		"""
+
+		if type(other) in [int, float]:
+
+			assert (other > 0), "Scalar must be larger than zero!"
+
+			return IngredientComponent(name=self.name,
+									   value=self.value / other,
+									   unit=self.unit,
+									   nutrients=self.nutrients / other,
+									   meta=self.meta)
+		elif type(other) == IngredientComponent:
+
+			assert (self.meta == other.meta), ("Two IngredientComponent objects' "
+											   "meta do not match.")
+
+			assert (other.value > 0), "Second IngredientComponent value <= 0."
+
+			return self.value / other.value
+
+
+	def __truediv__(self, other):
+		"""Overloading of the / operator."""
+
+		return self.divide(other)
+
+
+	# Container methods		
+		
 	def __len__(self):
+		"""Returns the number of nutrients within the Ingredients."""
 
 		return len(self.nutrients)
 
 	def __getitem__(self, key):
 
-		return IngredientComponent(name=self.name,
-								   value=self.value,
-								   nutrients=self.nutrients[key],
-								   unit=self.unit,
-								   meta=self.meta
-								   )
+
+		if type(key) not in [str, list]:
+
+			raise TypeError("Indexing must come with either str or list type.")
+
+		if type(key) == str:
+
+			return self.nutrients[key]
+
+		else:
+			return IngredientComponent(name=self.name,
+									   value=self.value,
+									   nutrients=self.nutrients[key],
+									   unit=self.unit,
+									   meta=self.meta
+									   )
+
 	def __delitem__(self, key):
 
 			del self.nutrients[key]
@@ -1246,12 +1458,16 @@ class BasketComponent(Component):
 
 		return len(self.children)
 
-	def __getitem__(self, key):
-
+	def loc(self, key):
+		"""
+		__getitem__ should be consistently used for nutrients indexing,
+		.loc(key) can be used for children selection.
+		"""
 
 		if type(key) not in [str, list]:
 
 			raise TypeError("Input key must be str or list.")
+
 
 		if type(key) == str:
 
@@ -1265,6 +1481,20 @@ class BasketComponent(Component):
 								   unit=self.unit,
 								   children=[self.children[k] for k in key]
 								   )
+
+	def __getitem__(self, key):
+
+		if type(key) not in [str, list]:
+
+			raise TypeError("Input key must be str or list.")
+
+		if type(key) == str:
+
+			key = [key, ]
+
+		return BasketComponent(name=self.name,
+							   unit=self.unit,
+							   children = [child[key] for child in self.children.values()])
 
 	def __delitem__(self, key):
 
@@ -1406,14 +1636,13 @@ class MealComponent(BasketComponent):
 
 		if type(key) == str:
 
-			return self.children[key]
+			key = [key, ]
 
-		else:
-			sub_meal = BasketComponent.__getitem__(self, key)
-			return MealComponent(name=self.name,
-								 children=list(sub_meal.children.values()),
-								 unit=self.unit,
-								 meta=self.meta)
+		sub_meal = BasketComponent.__getitem__(self, key)
+		return MealComponent(name=self.name,
+							 children=list(sub_meal.children.values()),
+							 unit=self.unit,
+							 meta=self.meta)
 
 	def flatten(self):
 
