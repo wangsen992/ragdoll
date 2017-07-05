@@ -250,8 +250,6 @@ class Nutrient(object):
 		else:
 			raise TypeError("Must be divided with a scalar or Nutrient object of the same type.")
 
-	# Functions for emulating container types.
-
 	def __repr__(self):
 		"""The representation of objects of Nutrient class."""
 
@@ -365,15 +363,13 @@ class Nutrients(object):
 			Nutrient object or a list of Nutrient objects to be added.
 		
 		"""
-		if type(nutrients) not in [Nutrient, list]:
-
-			raise TypeError("Input type must be Nutrient or list.")
-
-		if type(nutrients) == Nutrient:
+		if type(nutrients) != list:
 
 			nutrients = [nutrients, ]
 
 		for nutrient in nutrients:
+
+			assert (type(nutrient) == Nutrient), "{} not a Nutrient object.".format(nutrient)
 
 			if nutrient.abbr in self.nutrients:
 				# Cumulate nutrient values if there is existing Nutrient object
@@ -384,30 +380,6 @@ class Nutrients(object):
 				# Add Nutrient to collection if no existing Nutrient object
 				# of the same type. 
 				self.nutrients[nutrient.abbr] = nutrient
-
-
-	def __nutrient_check(nutrient):
-		"""A nutrient check on inputting nutrients
-		
-		This is now only a loner function, not called anywhere. 		
-
-		Check the type and format of the input nutrient. Only passed one can be
-		added to the Nutrients object. 
-
-		Currently, only the type check is conducted. Potentially in the future,
-		a more sophisticated format can be implemented for better control.
-
-		Parameters
-		----------
-		nutrient : Nutrient
-			Input Nutrient object to be checked.
-
-		"""
-
-		# Check on type
-		return type(nutrient) == Nutrient
-
-
 
 	def add(self, other, method="intersect"):
 		"""Addition with another Nutrients object
@@ -440,7 +412,7 @@ class Nutrients(object):
 				raise TypeError("Second argument not Nutrients object")
 
 		# Initiate a new dictionary for addition.
-		newNutrients_dict = dict()
+		newNutrients_dict = OrderedDict()
 
 		# Obtain the keys from both Nutrients objects. 
 		self_keys = self.nutrients.keys()
@@ -455,13 +427,9 @@ class Nutrients(object):
 
 					newNutrients_dict[abbr] = self.nutrients[abbr] + other.nutrients[abbr]
 
-				elif abbr in self_keys and abbr not in other_keys:
-
-					newNutrients_dict[abbr] = self.nutrients[abbr]
-
-				elif abbr not in self_keys and abbr in other_keys:
-
-					newNutrients_dict[abbr] = other.nutrients[abbr]
+				else:
+					newNutrients_dict[abbr] = self.nutrients[abbr] if abbr \
+											  in self_keys else other.nutrients[abbr]
 
 		elif method == "intersect":
 
@@ -507,7 +475,7 @@ class Nutrients(object):
 		if type(other) != Nutrients:
 			raise TypeError("Second argument not Nutrients object")
 
-		newNutrients_dict = dict()
+		newNutrients_dict = OrderedDict()
 
 		self_keys = self.nutrients.keys()
 		other_keys = other.nutrients.keys()
@@ -520,13 +488,10 @@ class Nutrients(object):
 
 					newNutrients_dict[abbr] = self.nutrients[abbr] - other.nutrients[abbr]
 
-				elif abbr in self_keys and abbr not in other_keys:
+				else:
 
-					newNutrients_dict[abbr] = self.nutrients[abbr]
-
-				elif abbr not in self_keys and abbr in other_keys:
-
-					newNutrients_dict[abbr] = float('-inf')
+					newNutrients_dict[abbr] = self.nutrients[abbr] if abbr in \
+											  self_keys else (-1) * other.nutrients[abbr]
 
 		if method == "intersect":
 
@@ -542,7 +507,7 @@ class Nutrients(object):
 		return self.sub(other, method="intersect")
 
 
-	def __mul__(self, scalar):
+	def multiply(self, scalar):
 		"""Multiplication with a scalar.
 
 		Note
@@ -565,9 +530,7 @@ class Nutrients(object):
 		if type(scalar) not in [int, float]:
 			raise ValueError("Must be multiplied with a scalar.")
 
-		assert (scalar >= 0), "Scalar must be equal or larger than zero!"
-
-		newNutrients_dict = dict()
+		newNutrients_dict = OrderedDict()
 
 		for abbr in self.nutrients.keys():
 
@@ -575,12 +538,16 @@ class Nutrients(object):
 
 		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
 
+	def __mul__(self, scalar):
+
+		return self.multiply(scalar)
+
 	def __rmul__(self, scalar):
 		"""Wrapper function of self.__mul__ for operation overloading on "*"."""
 
-		return self.__mul__(scalar)
+		return self.multiply(scalar)
 
-	def __truediv__(self, other, method='intersect'):
+	def divide(self, other, method='intersect'):
 		"""Division of a scalar.
 
 		Note
@@ -600,20 +567,15 @@ class Nutrients(object):
 
 		"""
 
-		if type(other) not in [int, float, Nutrients]:
-			raise ValueError("Must be multiplied with a scalar or a Nutrients object.")
+		newNutrients_dict = OrderedDict()
 
-		newNutrients_dict = dict()
-
-		if type(other) in [int, float]:
-
-			assert (other > 0), "Scalar must be larger than zero!"
+		if type(other) in [int, float]
 
 			for abbr in self.nutrients.keys():
 
 				newNutrients_dict[abbr] = self.nutrients[abbr] / other
-
-		else:
+		
+		elif:
 
 			if method == 'intersect':
 				for abbr in self.keys() & other.keys():
@@ -621,7 +583,15 @@ class Nutrients(object):
 			elif method == 'union':
 				raise ValueError("union can't be performed.")
 
+		else:
+			raise TypeError("Nutrients must be divided by a scalar or another Nutrients object.")
+
 		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
+
+
+	def __truediv__(self, other):
+
+		return self.divide(other)
 
 	# Emulating container type behaviors
 	def __len__(self):
@@ -638,7 +608,13 @@ class Nutrients(object):
 
 			return self.nutrients[key]
 
-		return Nutrients(input_nutrients=[self.nutrients[k] for k in key])
+		elif type(key) == list:
+
+			return Nutrients(input_nutrients=[self.nutrients[k] for k in key])
+
+		else:
+
+			raise TypeError("Key must be either a string or a list.")
 
 	def __delitem__(self, key):
 
@@ -653,21 +629,17 @@ class Nutrients(object):
 		for k in key:
 			del self.nutrients[k]
 
-	def __iter__(self):
-
-		return self.nutrients.__iter__()
-
 	def items(self):
 
 		for key in self.nutrients:
 
 			yield(key, self.nutrients[key])
 
-	def keys(self):
+	def abbrs(self):
 
 		return self.nutrients.keys()
 
-	def values(self):
+	def __iter__(self):
 
 		return self.nutrients.values()
 
@@ -681,9 +653,9 @@ class Nutrients(object):
 
 		entry_str = "".join([entry_format_str.format(abbr=nut.abbr,
 												     name=nut.name,
-												     value=nut.value,
-												     unit=nut.unit) 
-							 for nut in self.nutrients.values()])
+												     value=nut.amt.value,
+												     unit=nut.amt.unit) 
+							 for nut in self])
 
 		return title_str + entry_str
 
@@ -734,8 +706,7 @@ class Component(object):
 	def __init__(self, name="unknown"):
 
 		self.name = name
-		self.value = 0
-		self.unit = 'g'
+		self.amt = Amount(value=0, unit='g')
 		self.children = OrderedDict()
 		self.nutrients = Nutrients()
 		self.meta = dict()
