@@ -17,12 +17,26 @@ amount objects.
 mass_conversion_dict = {'g' : 1,
 						'mg' : 1e-3,
 						'µg' : 1e-6,
-						'kg' : 1e3}
+						'kg' : 1e3,
+						'克' : 1,
+						'毫克' : 1e-3,
+						'微克' : 1e-6,
+						'千克' : 1e3}
 length_conversion_dict = {'m' : 1,
 						  'cm' : 1e-2,
-						  'mm' : 1e-3}
+						  'mm' : 1e-3,
+						  '米' : 1,
+						  '厘米' : 1e-2,
+						  '毫米' : 1e-3}
+energy_conversion_dict = {'kJ' : 4.184,
+						  'kcal' : 1,
+						  '千卡' : 1,
+						  '千焦' : 4.184}
+iu_conversion_dict = {'IU' : 1}
 conversion_dict = {'mass' : mass_conversion_dict,
-				   'length' : length_conversion_dict}
+				   'length' : length_conversion_dict,
+				   'energy' : energy_conversion_dict,
+				   'IU' : iu_conversion_dict}
 
 # Module level functions
 
