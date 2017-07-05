@@ -137,7 +137,7 @@ class Amount(object):
 
 		if type(other) in [int, float]:
 			# Perform operation
-			return Amount(value=self.value * other,
+			return Amount(value=self.value / other,
 						  unit=self.unit)
 
 		elif type(other) == Amount:
