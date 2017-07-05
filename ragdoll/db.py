@@ -250,7 +250,6 @@ class RetrieveItemVisitor(Visitor):
 
             return meal
 
-
         collection = DiyNode.mongod.database[DiyNode.col_name]
         doc = collection.find_one({"_id" : bson.objectid.ObjectId(DiyNode.id)})
 

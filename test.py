@@ -25,10 +25,12 @@ meal_dict = {"五谷饭" : "595597b5d4ae8333cc8e257e",
 			 "墨西哥莎莎酱" : "59584dd4d4ae831089f4e5e6"
 			 }
 
-prob_dict = {}
-nuts = ['ENERC_KCAL', 'PROCNT', 'CHOCDF', 'FAT', 'FIBTG', 'VITA_IU', 'VITA_IU', 
-        'VITC', 'NIA', 'RIBF', 'CHOLE', 'THIA',  'TOCPHA', 'CARTB', 'CA', 
-        'MG', 'FE', 'MN', 'ZN', 'CU', 'K', 'P', 'NA', 'SE']
+meal = mongo.retrieve_item("DIY", "595597b5d4ae8333cc8e257e")
+
+# prob_dict = {}
+# nuts = ['ENERC_KCAL', 'PROCNT', 'CHOCDF', 'FAT', 'FIBTG', 'VITA_IU', 'VITA_IU', 
+#         'VITC', 'NIA', 'RIBF', 'CHOLE', 'THIA',  'TOCPHA', 'CARTB', 'CA', 
+#         'MG', 'FE', 'MN', 'ZN', 'CU', 'K', 'P', 'NA', 'SE']
 
 # test_man = Human(name='man', 
 #     			 gender='male', 
@@ -52,8 +54,8 @@ nuts = ['ENERC_KCAL', 'PROCNT', 'CHOCDF', 'FAT', 'FIBTG', 'VITA_IU', 'VITA_IU',
 # test_man.get_req(mongo, 'old_req')
 # test_woman.get_req(mongo, 'old_req')
 
-meal = mongo.retrieve_item('DIY', "595597b5d4ae8333cc8e257e")
-meal2 = mongo.retrieve_item('DIY', "59585f8fd4ae831417e50206")
+# print(test_man.nutrients)
+# print(test_woman.nutrients)
 
 
 # def operation(meal):

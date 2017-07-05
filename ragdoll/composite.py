@@ -701,6 +701,26 @@ class Component(object):
 		*. Basket2 + Meal1 = Basket3
 			*. Basket3.children consists of (Ingredient3 to Ingredient5, and Meal1)
 
+	Key operations:
+
+	There are two key sets of operations for the basic classes:
+	*. Indexing operations: As these classes act as containers, it is important
+	   to provide flexible indexing methods to enable a large set of potential
+	   operations. Those includes:
+		1. Indexing
+		2. Iterating
+		3. length
+		4. size
+		5. grouping?
+
+	*. Algebraic operations: Important to manipulate values by performing 
+	   algebraic operations such as addition, subtraction, multiplication
+	   and division between components. 
+
+	The relationship between components and their variation in methods decides
+	that BasketComponent inherits MealComponents, as MealComponents shares
+	similar operations with IngredientComponents. 
+
 	"""
 
 	def __init__(self, name="unknown"):
@@ -711,6 +731,71 @@ class Component(object):
 		self.nutrients = Nutrients()
 		self.meta = dict()
 
+	def __identity_check(self, other):
+
+		"""Test the identity between components"""
+
+		if type(self) != type(other) \
+		   or self.name != other.name \
+		   or self.meta != other.meta:
+
+			return False
+
+		else:
+			return True
+
+	def add(self, other):
+
+		"""Summation between two Components
+
+		Three types of components can be added to an IngredientComponent:
+
+		* IngredientComponent: 
+			*. if two IngredientComponent objects are the same, in terms of 
+			   meta infomation, the IngredientComponent is returned with 
+			   added value. 
+
+			*. if two IngredientComponent objects are not the same, in terms
+			   of meta information, a BasketComponent with children as a OrderedDict 
+			   consisting of those two Ingredient Components.
+
+		*. BasketComponent: 
+			*. If the IngredientComponent has peer in the BasketComponent (meta),
+			   this IngredientComponent will be added to that peer.
+			*. If the IngredientComponent has no peer in the BasketComponent,
+			   this IngredientComponent will be added to the children of the 
+			   BasketComponent.
+
+		*. MealComponent:
+			*. A BasketComponent is returned with children as a OrderedDict 
+			   consisting of the IngredientComponent and the MealComponent.
+
+		Parameters
+		----------
+		other: IngredientComponent or BasketComponent or MealComponent
+			The object to be added with. 
+
+		Returns
+		-------
+		IngredientComponent or BasketComponent
+			Type depends on the class of **other**.
+
+
+		"""
+
+		pass
+
+	def sub(self, other):
+
+		pass
+
+	def multiply(self, other):
+
+		pass
+
+	def divide(self, other):
+
+		pass
 
 	def __add__(self, other):
 
@@ -732,6 +817,8 @@ class Component(object):
 
 		pass
 
+
+
 	def insert_meta(self, key, value):
 
 		self.meta[key] = value
@@ -742,18 +829,6 @@ class Component(object):
 
 	def display_macro(self):
 
-		# macro_nut_abbr = ['ENERC_KCAL','PROCNT', 'FAT', 'CHOCDF']
-		# title_str = title_format_str.format(abbr='ABBR',
-		# 								    name='NAME',
-		# 								    value='VALUE',
-		# 								    unit='UNIT')
-		# entry_str = ''.join([entry_format_str.foramt(abbr=nut[key].abbr,
-		# 											 name=nut[key].name,
-		# 											 value=nut[key].value,
-		# 											 unit=nut[key].unit)
-		# 				     for nut in 
-		# for key in macro_nut_abbr:
-		# 	print(self.nutrients.nutrients[key])
 		pass
 
 	def display_minerals(self):
@@ -839,7 +914,9 @@ class IngredientComponent(Component):
 			raise TypeError("Second argument not a sub-Component object")
 
 		if type(other) == IngredientComponent:
-			if self.meta == other.meta:
+			if self.meta == other.meta \
+			   and self.name == other.name \
+			   and self.unit == other.unit:
 
 				return IngredientComponent(name=self.name,
 										   value=self.value+other.value,
@@ -1145,7 +1222,7 @@ class BasketComponent(Component):
 		if not issubclass(type(other), Component) :
 			raise TypeError("Second argument not a sub-Component object")
 
-		if type(other) == IngredientComponent:
+		if type(other) in [IngredientComponent, MealComponent]:
 			return BasketComponent(name='MyBasket',
 								   children=[*self.children.values(), other])
 
@@ -1153,9 +1230,6 @@ class BasketComponent(Component):
 			return BasketComponent(name='MyBasket',
 								   children=[*self.children.values(), *other.children.values()])
 
-		elif type(other) == MealComponent:
-			return BasketComponent(name='MyBasket',
-								   children=[*self.children.values(), other])
 
 	def __add__(self, other):
 
@@ -1275,6 +1349,7 @@ class BasketComponent(Component):
 		return MealComponent(name=name,
 							 children=list(self.children.values()),
 							 unit=self.unit)
+
 	def __repr__(self):
 
 		name_str = "Name: {name}\n".format(name=self.name)
@@ -1297,8 +1372,6 @@ class BasketComponent(Component):
 
 		return name_str + value_str + recipe_title_str \
 			   + recipe_entry_str + '\n' + self.nutrients.__repr__()
-
-
 
 
 class MealComponent(BasketComponent):
@@ -1366,22 +1439,6 @@ class MealComponent(BasketComponent):
 
 		return self.add(other)
 
-	def __getitem__(self, key):
-
-
-		if type(key) not in [str, list]:
-
-			raise TypeError("Input key must be str or list.")
-
-		if type(key) == str:
-
-			key = [key, ]
-
-		sub_meal = BasketComponent.__getitem__(self, key)
-		return MealComponent(name=self.name,
-							 children=list(sub_meal.children.values()),
-							 unit=self.unit,
-							 meta=self.meta)
 
 	def flatten(self):
 
@@ -1406,6 +1463,11 @@ class MealComponent(BasketComponent):
 								  'meta' : child.meta} for child in self.children.values()]
 
 		return out_dict
+
+
+
+
+
 
 
 
