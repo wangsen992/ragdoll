@@ -30,55 +30,58 @@ nuts = ['ENERC_KCAL', 'PROCNT', 'CHOCDF', 'FAT', 'FIBTG', 'VITA_IU', 'VITA_IU',
         'VITC', 'NIA', 'RIBF', 'CHOLE', 'THIA',  'TOCPHA', 'CARTB', 'CA', 
         'MG', 'FE', 'MN', 'ZN', 'CU', 'K', 'P', 'NA', 'SE']
 
-test_man = Human(name='man', 
-    			 gender='male', 
-    			 age=25, 
-    			 height=175, 
-    			 weight=68, 
-    			 PAL=1.2, 
-    			 AMRD={"PROCNT" : 0.25,
-						 "FAT"    : 0.25,
-						 "CHOCDF" : 0.5})
-test_woman = Human(name='woman', 
-    			   gender='female', 
-    			   age=25, 
-    			   height=165, 
-    			   weight=50, 
-    			   PAL=1.2, 
-    			   AMRD={"PROCNT" : 0.25,
-						 "FAT"    : 0.25,
-						 "CHOCDF" : 0.5})
+# test_man = Human(name='man', 
+#     			 gender='male', 
+#     			 age=25, 
+#     			 height=175, 
+#     			 weight=68, 
+#     			 PAL=1.2, 
+#     			 AMRD={"PROCNT" : 0.25,
+# 						 "FAT"    : 0.25,
+# 						 "CHOCDF" : 0.5})
+# test_woman = Human(name='woman', 
+#     			   gender='female', 
+#     			   age=25, 
+#     			   height=165, 
+#     			   weight=50, 
+#     			   PAL=1.2, 
+#     			   AMRD={"PROCNT" : 0.25,
+# 						 "FAT"    : 0.25,
+# 						 "CHOCDF" : 0.5})
 
-test_man.get_req(mongo, 'old_req')
-test_woman.get_req(mongo, 'old_req')
+# test_man.get_req(mongo, 'old_req')
+# test_woman.get_req(mongo, 'old_req')
 
-
-def operation(meal):
-
-	meal.nutrients = meal.nutrients[nuts]
-
-	with open("{name}.txt".format(name=meal.name), 'w') as fout:
-
-		fout.write("餐名 : {name}\n".format(name=meal.name))
-		fout.write("成分\n")
-		fout.write(meal.__repr__())
+meal = mongo.retrieve_item('DIY', "595597b5d4ae8333cc8e257e")
+meal2 = mongo.retrieve_item('DIY', "59585f8fd4ae831417e50206")
 
 
-	# donut_plot(meal, test_man, test_woman)
+# def operation(meal):
 
-	plot_paracoor(meal.flatten(), test_man)
+# 	meal.nutrients = meal.nutrients[nuts]
 
-err_list = []
+# 	with open("{name}.txt".format(name=meal.name), 'w') as fout:
 
-for name, item_id in prob_dict.items():
-
-	print("Working on {name}...\n".format(name=name))
-
-	if "{name}折线.png".format(name=name) in os.listdir():
-		continue
+# 		fout.write("餐名 : {name}\n".format(name=meal.name))
+# 		fout.write("成分\n")
+# 		fout.write(meal.__repr__())
 
 
-	meal = mongo.retrieve_item("DIY", item_id)
-	operation(meal)
+# 	# donut_plot(meal, test_man, test_woman)
+
+# 	plot_paracoor(meal.flatten(), test_man)
+
+# err_list = []
+
+# for name, item_id in prob_dict.items():
+
+# 	print("Working on {name}...\n".format(name=name))
+
+# 	if "{name}折线.png".format(name=name) in os.listdir():
+# 		continue
+
+
+# 	meal = mongo.retrieve_item("DIY", item_id)
+# 	operation(meal)
 
 
