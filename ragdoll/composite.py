@@ -236,19 +236,21 @@ class Nutrient(object):
 
 			new_amt = self.amt / other
 
-			return Nutrient(name=self.name,
-							value=new_amt.value,
-							unit=new_amt.unit,
-							abbr=self.abbr,
-							source=self.source,
-							name_source=self.name_source)
 
 		elif self.__type_test(other):
 
-			return self.amt / other.amt
+			new_amt = self.amt / other.amt
 
 		else:
 			raise TypeError("Must be divided with a scalar or Nutrient object of the same type.")
+
+		return Nutrient(name=self.name,
+						value=new_amt.value,
+						unit=new_amt.unit,
+						abbr=self.abbr,
+						source=self.source,
+						name_source=self.name_source)
+
 
 	def __repr__(self):
 		"""The representation of objects of Nutrient class."""
@@ -351,8 +353,21 @@ class Nutrients(object):
 
 		self.nutrients = OrderedDict()
 		self.add_nutrients(input_nutrients)
+		self.update_attrs()
 
-		
+
+	def update_attrs(self):
+
+		# Set attrs
+		self.nutrs = [nut for nut in self.nutrients.values()]
+		self.abbrs = [nut.abbr for nut in self.nutrients.values()]
+		self.names = [nut.name for nut in self.nutrients.values()]
+		self.sources = [nut.source for nut in self.nutrients.values()]
+		self.name_sources = [nut.name_source for nut in self.nutrients.values()]
+		self.units = [nut.amt.unit for nut in self.nutrients.values()]
+		self.values = [nut.amt.value for nut in self.nutrients.values()]
+		self.amts = [nut.amt for nut in self.nutrients.values()]
+		self.size = self.__len__()
 
 	def add_nutrients(self, nutrients):
 		"""Insert nutrients into the Nutrients object.
@@ -506,7 +521,6 @@ class Nutrients(object):
 
 		return self.sub(other, method="intersect")
 
-
 	def multiply(self, scalar):
 		"""Multiplication with a scalar.
 
@@ -569,16 +583,16 @@ class Nutrients(object):
 
 		newNutrients_dict = OrderedDict()
 
-		if type(other) in [int, float]
+		if type(other) in [int, float]:
 
 			for abbr in self.nutrients.keys():
 
 				newNutrients_dict[abbr] = self.nutrients[abbr] / other
 		
-		elif:
+		elif type(other) == Nutrients:
 
 			if method == 'intersect':
-				for abbr in self.keys() & other.keys():
+				for abbr in self.nutrients.keys() & other.nutrients.keys():
 					newNutrients_dict[abbr] = self.nutrients[abbr] / other.nutrients[abbr]
 			elif method == 'union':
 				raise ValueError("union can't be performed.")
@@ -587,7 +601,6 @@ class Nutrients(object):
 			raise TypeError("Nutrients must be divided by a scalar or another Nutrients object.")
 
 		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
-
 
 	def __truediv__(self, other):
 
@@ -600,15 +613,11 @@ class Nutrients(object):
 
 	def __getitem__(self, key):
 
-		if type(key) not in [str, list]:
-
-			raise TypeError("Indexing must come with either str or list type.")
-
 		if type(key) == str:
 
-			return self.nutrients[key]
+			key = [key, ]
 
-		elif type(key) == list:
+		if type(key) == list:
 
 			return Nutrients(input_nutrients=[self.nutrients[k] for k in key])
 
@@ -618,31 +627,56 @@ class Nutrients(object):
 
 	def __delitem__(self, key):
 
-		if type(key) not in [str, list]:
-
-			raise TypeError("Indexing must come with either str or list type.")
-
 		if type(key) == str:
 
 			key = [key, ]
 
-		for k in key:
-			del self.nutrients[k]
+		if type(key) == list: 
+			for k in key:
+				del self.nutrients[k]
+			self.update_attrs()
 
-	def items(self):
-
-		for key in self.nutrients:
-
-			yield(key, self.nutrients[key])
-
-	def abbrs(self):
-
-		return self.nutrients.keys()
+		else:
+			raise TypeError("Indexing must come with either str or list type.")
 
 	def __iter__(self):
 
-		return self.nutrients.values()
+		for i in self.nutrients.values():
+			yield i
 
+	# Sort capability
+	def sort(self, key='amt', reverse=False):
+		"""Sort with a specified key"""
+
+		nutrients = sorted(self.nutrients.values(),
+						   key=lambda nut : getattr(nut, key),
+						   reverse=reverse)
+
+		return Nutrients(input_nutrients=nutrients)
+
+	# Aggregate functions
+	# This remains a problem as the sum may not have a physical meaning. 
+
+	# grouping
+	def group(self):
+
+		pass
+
+	def unify_units(self, target_unit='g'):
+
+		nutrients = []
+		for nut in self.nutrs:
+			print(nut.name)
+			print(nut.amt)
+			new_amt = nut.amt.convert(target_unit)
+			nutrients.append(Nutrient(name=nut.name,
+									  value=new_amt.value,
+									  unit=new_amt.unit,
+									  abbr=nut.abbr,
+									  source=nut.source,
+									  name_source=nut.name_source))
+
+		return Nutrients(input_nutrients=nutrients)
 
 	def __repr__(self):
 		"""Representation of Nutrients object."""
