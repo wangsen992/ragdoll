@@ -25,7 +25,7 @@ meal_dict = {"五谷饭" : "595597b5d4ae8333cc8e257e",
 			 "墨西哥莎莎酱" : "59584dd4d4ae831089f4e5e6"
 			 }
 
-meal = mongo.retrieve_item("DIY", "595597b5d4ae8333cc8e257e")
+meal = mongo.retrieve_item("DIY", "593bc7e2445ba7052fa73d6b")
 
 # prob_dict = {}
 # nuts = ['ENERC_KCAL', 'PROCNT', 'CHOCDF', 'FAT', 'FIBTG', 'VITA_IU', 'VITA_IU', 
