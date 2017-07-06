@@ -4,10 +4,10 @@
 Amount object mainly exist to handle algebraic operations with physical
 meanings. For example, 
 
-	1g + 10g = 11g
-	1g + 1kg = 1.001kg
-	1cm + 1dm = 1.1dm
-	1g + 1cm : not valid!!!!!
+    1g + 10g = 11g
+    1g + 1kg = 1.001kg
+    1cm + 1dm = 1.1dm
+    1g + 1cm : not valid!!!!!
 
 The handling on unit is supported beyond the scope of user. However, it
 could be possible for users to apply unit conversion operations on those
@@ -15,202 +15,314 @@ amount objects.
 """
 
 mass_conversion_dict = {'g' : 1,
-						'mg' : 1e-3,
-						'µg' : 1e-6,
-						'kg' : 1e3,
-						'克' : 1,
-						'毫克' : 1e-3,
-						'微克' : 1e-6,
-						'千克' : 1e3}
+                        'mg' : 1e-3,
+                        'µg' : 1e-6,
+                        'kg' : 1e3,
+                        '克' : 1,
+                        '毫克' : 1e-3,
+                        '微克' : 1e-6,
+                        '千克' : 1e3}
 length_conversion_dict = {'m' : 1,
-						  'cm' : 1e-2,
-						  'mm' : 1e-3,
-						  '米' : 1,
-						  '厘米' : 1e-2,
-						  '毫米' : 1e-3}
+                          'cm' : 1e-2,
+                          'mm' : 1e-3,
+                          '米' : 1,
+                          '厘米' : 1e-2,
+                          '毫米' : 1e-3}
 energy_conversion_dict = {'kJ' : 4.184,
-						  'kcal' : 1,
-						  '千卡' : 1,
-						  '千焦' : 4.184}
+                          'kcal' : 1,
+                          '千卡' : 1,
+                          '千焦' : 4.184}
 scalar_conversion_dict = {' ' : 1}
 iu_conversion_dict = {'IU' : 1}
 conversion_dict = {'mass' : mass_conversion_dict,
-				   'length' : length_conversion_dict,
-				   'energy' : energy_conversion_dict,
-				   'IU' : iu_conversion_dict,
-				   'scalar' : scalar_conversion_dict}
+                   'length' : length_conversion_dict,
+                   'energy' : energy_conversion_dict,
+                   'IU' : iu_conversion_dict,
+                   'scalar' : scalar_conversion_dict}
 
 # Module level functions
 
 def find_type(unit):
-	"""Find the type of the unit.
-	"""
+    """Find the type of the unit.
+    """
 
-	for name, d in conversion_dict.items():
-		if unit in d:
-			return name
-	else:
-		raise TypeError("Invalid input unit.")
+    for name, d in conversion_dict.items():
+        if unit in d:
+            return name
+    else:
+        raise TypeError("Invalid input unit.")
 
 def find_target_unit(amtA, amtB):
 
-	target_unit = amtA.unit \
-		  if conversion_dict[amtA.value_type][amtA.unit] >= \
-		     conversion_dict[amtB.value_type][amtB.unit] \
-		  else amtB.unit
+    target_unit = amtA.unit \
+          if conversion_dict[amtA.value_type][amtA.unit] >= \
+             conversion_dict[amtB.value_type][amtB.unit] \
+          else amtB.unit
 
-	return target_unit
+    return target_unit
 
 # Main module object
 
 class Amount(object):
-	"""A help class coodinating values and units.
+    """A help class coodinating values and units.
 
-	Note
-	----
-	Default unit conversion direction is upward. 
+    Note
+    ----
+    Default unit conversion direction is upward. 
 
-	"""
+    """
 
-	def __init__(self, value, unit):
-		"""As name suggests."""
+    def __init__(self, value, unit):
+        """As name suggests."""
 
-		self.value = value
-		self.unit = unit
-		self.value_type = find_type(unit)
-
-
-	def convert(self, target_unit):
-		"""Convert the value from one unit into another"""
-
-		if self.value_type != find_type(target_unit):
-
-			raise TypeError("target_unit is not the same type.")
-
-		conversion_factor = conversion_dict[self.value_type][self.unit] \
-						   / conversion_dict[self.value_type][target_unit]
-
-		target_value = self.value * conversion_factor
-
-		return Amount(value=target_value,
-					  unit=target_unit)
+        self.value = value
+        self.unit = unit
+        self.value_type = find_type(unit)
 
 
-	def __add__(self, other):
-		"""Summation between two Amount objects"""
+    def convert(self, target_unit):
+        """Convert the value from one unit into another"""
 
-		# Perform type check
-		self.__type_check(other)
+        if self.value_type != find_type(target_unit):
 
-		# Consolidate units before operation
+            raise TypeError("target_unit is not the same type.")
 
-		target_unit = self.__find_target_unit(other)
+        conversion_factor = conversion_dict[self.value_type][self.unit] \
+                           / conversion_dict[self.value_type][target_unit]
 
-		# Obtain value
+        target_value = self.value * conversion_factor
 
-		new_self = self.convert(target_unit)
-		new_other = other.convert(target_unit)
+        return Amount(value=target_value,
+                      unit=target_unit)
 
-		return Amount(value=new_self.value + new_other.value,
-					  unit=target_unit)
-	
-	def __sub__(self, other):
-		"""subtraction between two Amount objects"""
 
-		# Perform type check
-		self.__type_check(other)
+    def __add__(self, other):
+        """Summation between two Amount objects"""
 
-		# Consolidate units before operation
+        # Perform type check
+        self.__type_check(other)
 
-		target_unit = self.__find_target_unit(other)
+        # Consolidate units before operation
 
-		# Obtain value
+        target_unit = self.__find_target_unit(other)
 
-		new_self = self.convert(target_unit)
-		new_other = other.convert(target_unit)
+        # Obtain value
 
-		return Amount(value=new_self.value - new_other.value,
-					  unit=target_unit)
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
 
-	def __mul__(self, scalar):
-		"""Multiplication between Amount object and scalar."""
+        return Amount(value=new_self.value + new_other.value,
+                      unit=target_unit)
+    
+    def __sub__(self, other):
+        """subtraction between two Amount objects"""
 
-		# Perform type check
-		if type(scalar) not in [int, float]:
-			raise TypeError("Amount object must be multiplied with scalar.")
+        # Perform type check
+        self.__type_check(other)
 
-		# Perform operation
-		return Amount(value=self.value * scalar,
-					  unit=self.unit)
+        # Consolidate units before operation
 
-	def __rmul__(self, scalar):
-		"""Multiplication between Amount object and scalar."""
+        target_unit = self.__find_target_unit(other)
 
-		return self.__mul__(scalar)
+        # Obtain value
 
-	def __truediv__(self, other):
-		"""Multiplication between Amount object and scalar or Amount obj."""
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
 
-		if type(other) in [int, float]:
-			# Perform operation
-			return Amount(value=self.value / other,
-						  unit=self.unit)
+        return Amount(value=new_self.value - new_other.value,
+                      unit=target_unit)
 
-		elif type(other) == Amount:
-			# Perform type check
-			self.__type_check(other)
+    def __mul__(self, scalar):
+        """Multiplication between Amount object and scalar."""
 
-			# Consolidate unit
-			target_unit = self.__find_target_unit(other)
+        # Perform type check
+        if type(scalar) not in [int, float]:
+            raise TypeError("Amount object must be multiplied with scalar.")
 
-			# Obtain value
+        # Perform operation
+        return Amount(value=self.value * scalar,
+                      unit=self.unit)
 
-			new_self = self.convert(target_unit)
-			new_other = other.convert(target_unit)
+    def __rmul__(self, scalar):
+        """Multiplication between Amount object and scalar."""
 
-			return Amount(value=new_self.value / new_other.value,
-						  unit=' ') 
-
-		else:
-			raise TypeError("Amount object must be divided with a scalar or Amount object.")
+        return self.__mul__(scalar)
 
 
 
-	def __find_target_unit(self, other):
+    def __truediv__(self, other):
+        """Multiplication between Amount object and scalar or Amount obj."""
 
-		target_unit = find_target_unit(self, other)
+        if type(other) in [int, float]:
+            # Perform operation
+            return Amount(value=self.value / other,
+                          unit=self.unit)
 
-		return target_unit
+        elif type(other) == Amount:
+            # Perform type check
+            self.__type_check(other)
 
-	def __type_check(self, other):
+            # Consolidate unit
+            target_unit = self.__find_target_unit(other)
 
-		# First check other is Amount object
-		if type(other) != Amount:
-			raise TypeError("Second argument is not Amount object.")
+            # Obtain value
 
-		# Second check type of Amount objects
-		if self.value_type != other.value_type:
-			raise TypeError("Second argument is not the same type.")
+            new_self = self.convert(target_unit)
+            new_other = other.convert(target_unit)
 
-	def __repr__(self):
+            return Amount(value=new_self.value / new_other.value,
+                          unit=' ') 
 
-		return "{o.value}{o.unit}".format(o=self)
+        else:
+            raise TypeError("Amount object must be divided with a scalar or Amount object.")
+
+    # Comparison operators
+    def __lt__(self, other):
+        """Less than test"""
+
+        # Perform type check
+        self.__type_check(other)
+
+        # Consolidate units before operation
+
+        target_unit = self.__find_target_unit(other)
+
+        # Obtain value
+
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
+
+        # return value
+        return  new_self.value < new_other.value
+
+
+    def ___le__(self, other):
+        """less or equal test"""
+
+        # Perform type check
+        self.__type_check(other)
+
+        # Consolidate units before operation
+
+        target_unit = self.__find_target_unit(other)
+
+        # Obtain value
+
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
+
+        # return value
+        return  new_self.value <= new_other.value
+
+    def __eq__(self, other):
+        "Equal test"
+
+        # Perform type check
+        self.__type_check(other)
+
+        # Consolidate units before operation
+
+        target_unit = self.__find_target_unit(other)
+
+        # Obtain value
+
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
+
+        # return value
+        return  new_self.value == new_other.value
+
+    def __ne__(self, other):
+        """Not equal test"""
+
+        # Perform type check
+        self.__type_check(other)
+
+        # Consolidate units before operation
+
+        target_unit = self.__find_target_unit(other)
+
+        # Obtain value
+
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
+
+        # return value
+        return  new_self.value != new_other.value
+
+    def __gt__(self, other):
+        """Greater than test"""
+
+        # Perform type check
+        self.__type_check(other)
+
+        # Consolidate units before operation
+
+        target_unit = self.__find_target_unit(other)
+
+        # Obtain value
+
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
+
+        # return value
+        return  new_self.value > new_other.value
+
+    def __ge__(self, other):
+        """Greater or equal test"""
+
+        # Perform type check
+        self.__type_check(other)
+
+        # Consolidate units before operation
+
+        target_unit = self.__find_target_unit(other)
+
+        # Obtain value
+
+        new_self = self.convert(target_unit)
+        new_other = other.convert(target_unit)
+
+        # return value
+        return  new_self.value >= new_other.value
+
+
+
+    def __find_target_unit(self, other):
+
+        target_unit = find_target_unit(self, other)
+
+        return target_unit
+
+    def __type_check(self, other):
+
+        # First check other is Amount object
+        if type(other) != Amount:
+            raise TypeError("Second argument is not Amount object.")
+
+        # Second check type of Amount objects
+        if self.value_type != other.value_type:
+            raise TypeError("Second argument is not the same type.")
+
+    def __repr__(self):
+
+        return "{o.value}{o.unit}".format(o=self)
 
 if __name__ == '__main__':
-	
-	val1 = Amount(value=10, unit='g')
-	val2 = Amount(value=10, unit='mg')
-	val3 = Amount(value=5, unit='cm')
-	print(val1)
-	print(val2)
-	print(val3)
+    
+    val1 = Amount(value=10, unit='g')
+    val2 = Amount(value=10, unit='mg')
+    val3 = Amount(value=5, unit='cm')
+    print(val1)
+    print(val2)
+    print(val3)
 
-	out_val1 = val1 + val1
-	print(out_val1)  # result: 20.01g
-	out_val2 = val1 + val2
-	print(out_val2)  # result: 10.01g
-	out_val3 = val1 / val2
-	print(out_val3)  # result : 1000.0
+    out_val1 = val1 + val1
+    print(out_val1)  # result: 20.01g
+    out_val2 = val1 + val2
+    print(out_val2)  # result: 10.01g
+    out_val3 = val1 / val2
+    print(out_val3)  # result : 1000.0
 
 
 
