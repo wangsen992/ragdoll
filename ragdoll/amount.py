@@ -171,12 +171,13 @@ class Amount(object):
             new_other = other.convert(target_unit)
 
             try:
-	            return Amount(value=new_self.value / new_other.value,
-	                          unit=' ')
-	        except ZeroDivisionError:
+                return Amount(value=new_self.value / new_other.value,
+                              unit=' ')
 
-	        	return Amount(value=float('nan'),
-	        				  unit=' ') 
+            except ZeroDivisionError:
+
+                return Amount(value=float('nan'),
+                              unit=' ') 
 
         else:
             raise TypeError("Amount object must be divided with a scalar or Amount object.")
@@ -311,7 +312,7 @@ class Amount(object):
 
     def __repr__(self):
 
-        return "{o.value}{o.unit}".format(o=self)
+        return "{o.value:.3f}{o.unit}".format(o=self)
 
 if __name__ == '__main__':
     
