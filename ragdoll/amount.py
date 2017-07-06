@@ -32,11 +32,13 @@ energy_conversion_dict = {'kJ' : 4.184,
 						  'kcal' : 1,
 						  '千卡' : 1,
 						  '千焦' : 4.184}
+scalar_conversion_dict = {' ' : 1}
 iu_conversion_dict = {'IU' : 1}
 conversion_dict = {'mass' : mass_conversion_dict,
 				   'length' : length_conversion_dict,
 				   'energy' : energy_conversion_dict,
-				   'IU' : iu_conversion_dict}
+				   'IU' : iu_conversion_dict,
+				   'scalar' : scalar_conversion_dict}
 
 # Module level functions
 
@@ -166,7 +168,8 @@ class Amount(object):
 			new_self = self.convert(target_unit)
 			new_other = other.convert(target_unit)
 
-			return new_self.value / new_other.value
+			return Amount(value=new_self.value / new_other.value,
+						  unit=' ') 
 
 		else:
 			raise TypeError("Amount object must be divided with a scalar or Amount object.")
