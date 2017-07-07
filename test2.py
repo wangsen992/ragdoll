@@ -3,20 +3,26 @@ A test for ragdoll.
 """
 
 from ragdoll import *
-from bson.son import SON
-import pprint
 
 mongo = MongoDB(host='47.93.246.201', port=27017, database='eatech', user='harry', password='password')
-# db = mongo.database
 
 #------------------------------------------------#
 
-def viaName(str, dispName=True, databaseName='USDA'):
+def viaName(str, databaseName, dispName=True):
 
-    # Fuzzy search for name string matching
-    # eg: db.getCollection('USDA').find({'name.long': {'$regex': '.*Butter.*'}}, {'_id': 1,name': 1})
-    # For fuzzy search in any order
-    # eg: {'name.long': {'$regex': '^(?=.*Butter)(?=.*salt).+', '$options': 'i'}}
+    '''
+    Fuzzy search for name string matching (case insensitive).
+
+    For English fuzzy search, insert string seperated with space. eg: 'Butter salt'
+        Generated query: {'name.long': {'$regex': '^(?=.*Butter)(?=.*salt).+', '$options': 'i'}}
+    Return: any object whose name contains all keywords in any order.
+    Chinese fuzzy search not defined yet.
+
+    TODO: 
+    Search suggestions: split sentence into words and compare words with high frequency dictionary, 
+        give close words search when original word is not available.
+
+    '''
 
     if databaseName == 'USDA':
         path = 'name.long'
@@ -33,7 +39,7 @@ def viaName(str, dispName=True, databaseName='USDA'):
         query = {}
         query[path] = {}
         query[path]['$regex'] = str
-        query[path]['$options'] = 'i' # case insensitivity
+        query[path]['$options'] = 'i'
         
         return query
 
@@ -56,11 +62,12 @@ def viaName(str, dispName=True, databaseName='USDA'):
 
 #------------------------------------------------#
 
-def viaRange(nutrients, dispNutrients=False, databaseName='USDA'):
+def viaRange(nutrients, databaseName='USDA', dispNutrients=False):
     
     # DIY contains materials not nutrients, not available right now
 
     '''
+    Query example: 
     cur = db.USDA.find({'nutrients': { '$all': [{ '$elemMatch' : {'abbr' : tag1, 'value' : val1}},
                                                 { '$elemMatch' : {'abbr' : tag2, 'value' : val2}}
                                                 ]}},
@@ -115,25 +122,28 @@ def viaRange(nutrients, dispNutrients=False, databaseName='USDA'):
 
 #------------------------------------------------#
 
-def viaTag():
-    
+def viaTag(reqDict, databaseName):
+    '''
+    eg: {'type':'乳类', 'name':'奶油'}
+    '''
+    query = reqDict
+    display = {}
+    for name, val in reqDict.items():
+        display[name] = 1
+
+    if databaseName == 'USDA':
+        cursor = mongo.database.USDA.find(query, display)
+    elif databaseName == 'Foodmate':
+        cursor = mongo.database.Foodmate.find(query, display)
+    elif databaseName == 'DIY':
+        cursor = mongo.database.DIY.find(query, display)
+    else:
+        raise Exception('Insert a vaild database.')
+
+    return cursor
 
 
 #------------------------------------------------#
-
-# test for viaRange
-
-'''
-
-nutrients = [{'abbr' : 'PROCNT', 'value' : 0.49},
-             {'abbr' : 'CHOCDF', 'value' : 2.87}]
-
-cur = viaRange(nutrients)
-for doc in cur:
-    print(doc)
-
-
-'''
 
 
 # test for viaName
@@ -142,6 +152,31 @@ for doc in cur:
 str = 'Butter salt'
 
 cur = viaName(str,databaseName='USDA')
+for doc in cur:
+    print(doc)
+
+'''
+
+
+# test for viaRange
+
+'''
+nutrients = [{'abbr' : 'PROCNT', 'value' : 0.49},
+             {'abbr' : 'CHOCDF', 'value' : 2.87}]
+
+cur = viaRange(nutrients)
+for doc in cur:
+    print(doc)
+
+'''
+
+
+# test for viaTag
+
+'''
+dictionary = {'type':'乳类', 'name': '奶油''}
+
+cur = viaTag(dictionary, databaseName='Foodmate')
 for doc in cur:
     print(doc)
 
