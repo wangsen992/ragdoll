@@ -9,35 +9,52 @@ import pprint
 mongo = MongoDB(host='47.93.246.201', port=27017, database='eatech', user='harry', password='password')
 # db = mongo.database
 
+#------------------------------------------------#
 
-def viaName(str, databaseName='DIY'):
+def viaName(str, dispName=True, databaseName='USDA'):
 
     # Fuzzy search for name string matching
+    # eg: db.getCollection('USDA').find({'name.long': {'$regex': '.*Butter.*'}}, {'_id': 1,name': 1})
+    # For fuzzy search in any order
+    # eg: {'name.long': {'$regex': '^(?=.*Butter)(?=.*salt).+', '$options': 'i'}}
 
-    display = {'_id':1}
-    if True: display['name'] = 1
+    if databaseName == 'USDA':
+        path = 'name.long'
+        regexStr = '^'+''.join(['(?=.*'+word+')' for word in str.split(' ')])+'.+'
+    elif databaseName == 'Foodmate' or databaseName == 'DIY':
+        path = 'name'
+        regexStr = '.*' + str + '.*'
+    else:
+        raise Exception('Insert a vaild database.')
 
-    def USDAQueryGen(str):
+
+    def queryGen(str):
 
         query = {}
-        query['name.long'] = {}
-        query['name.long']['$regex'] = '.*' + str + '.*'
-
+        query[path] = {}
+        query[path]['$regex'] = str
+        query[path]['$options'] = 'i' # case insensitivity
+        
         return query
 
-    
+    # further output format to be set
+    display = {'_id':1}
+    if dispName: display['name'] = 1
 
-    query = USDAQueryGen(str)
-    cursor = mongo.database.USDA.find(query, display)
+    query = queryGen(regexStr)
+    
+    if databaseName == 'USDA':
+        cursor = mongo.database.USDA.find(query, display)
+    elif databaseName == 'Foodmate':
+        cursor = mongo.database.Foodmate.find(query, display)
+    elif databaseName == 'DIY':
+        cursor = mongo.database.DIY.find(query, display)
+    else:
+        raise Exception('Insert a vaild database.')        
 
     return cursor
 
-
-
-
-
 #------------------------------------------------#
-
 
 def viaRange(nutrients, dispNutrients=False, databaseName='USDA'):
     
@@ -84,6 +101,7 @@ def viaRange(nutrients, dispNutrients=False, databaseName='USDA'):
     if dispNutrients: display['nutrients'] = 1
 
     query = queryGen(nutrients)
+
     if databaseName == 'USDA':
         cursor = mongo.database.USDA.find(query, display)
     elif databaseName == 'Foodmate':
@@ -97,7 +115,11 @@ def viaRange(nutrients, dispNutrients=False, databaseName='USDA'):
 
 #------------------------------------------------#
 
+def viaTag():
+    
 
+
+#------------------------------------------------#
 
 # test for viaRange
 
@@ -116,12 +138,14 @@ for doc in cur:
 
 # test for viaName
 
-str = 'Butter'
+'''
+str = 'Butter salt'
 
-cur = viaName(str)
+cur = viaName(str,databaseName='USDA')
 for doc in cur:
-    print(cur)
+    print(doc)
 
+'''
 
 
 
