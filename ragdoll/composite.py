@@ -659,6 +659,26 @@ class Nutrients(object):
 
 	# grouping
 	def group(self):
+		"""Group with Nutrient types
+		
+		Note
+		----
+		So there is a need to update Nutrient relation at Nutrient __init__.
+
+		"""
+
+		pass
+
+	def simplify(self):
+		"""Simplify Nutrients with nutrients relationships.
+		
+		A unified simplification of Nutrients can serve two purposes:
+		1. Create a much clearer representation of nutrients available inside.
+		2. Enable a more fluid computation across Nutrients objects, and also
+		   allows a better sorting operation by avoiding different nutrient 
+		   types colliding on each other. 
+
+		"""
 
 		pass
 
@@ -666,8 +686,6 @@ class Nutrients(object):
 
 		nutrients = []
 		for nut in self.nutrs:
-			print(nut.name)
-			print(nut.amt)
 			new_amt = nut.amt.convert(target_unit)
 			nutrients.append(Nutrient(name=nut.name,
 									  value=new_amt.value,
