@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft"
+	  xmlns:viz="http://www.gexf.net/1.2draft/viz"
+	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:schemaLocation="http://www.gexf.net/1.2draft 
+	  					  http://www.dexf.net/1.2draft/gexf.xsd"
+	  version="1.2">
+	<meta lastmodifieddate="2017-07-15">
+		<creator>Sen Wang</creator>
+		<description>A graph of nutrient network</description>
+	</meta>
+	<graph mode="static" defaultedgetype="directed">
+		<attributes class="node">
+			<attribute id="0" title="test_attr" type="string"/>
+		</attributes>
+		<nodes>
+			<node id="CBH" label="Carbohydrate"/>
+			<node id="MACC" label="Monosaccharide"/>
+			<node id="DACC" label="Disaccharide"/>
+			<node id="PACC" label="Polysaccharide"/>
+			<node id="GLUS" label="Glucose"/>
+			<node id="FRUS" label="Fructose"/>
+			<node id="GALS" label="Galactose"/>
+			<node id="LACS" label="Lactose"/>
+			<node id="MALS" label="Maltose"/>
+			<node id="SUCS" label="Sucrose"/>
+			<node id="FIBTG" label="Dietary Fiber"/>
+			<node id="STARCH" label="Starch"/>
+
+			<node id="PROCNT" label="Protein"/>
+			<node id="AA" label="Amino Acid"/>
+			<node id="IAA" label="Indispensable Amino Acid"/>
+			<node id="CIAA" label="Conditionally Indispensable Amino Acid"/>
+			<node id="DAA" label="Dispensable Amino Acid"/>
+			<node id="VAL_G" label="Valine"/>
+			<node id="ILE_G" label="Isoleucine"/>
+			<node id="LEU_G" label="Leucine"/>
+			<node id="LYS_G" label="Lysine"/>
+			<node id="MET_G" label="Methionine"/>
+			<node id="PHE_G" label="Phenylanine"/>
+			<node id="THR_G" label="Threonine"/>
+			<node id="TRP_G" label="Tryptophan"/>
+			<node id="HISTN_G" label="Histidine"/>
+			<node id="GLY_G" label="Glycine"/>
+			<node id="ARG_G" label="Arginine"/>
+			<node id="GLN_G" label="Glutamine"/>
+			<node id="PRO_G" label="Proline"/>
+			<node id="CYS_G" label="Cystine"/>
+			<node id="TYR_G" label="Tryosine"/>
+			<node id="TAU_G" label="Taurine"/>
+			<node id="ORN_G" label="Ornithine"/>
+			<node id="CIT_G" label="Citrulline"/>
+			<node id="GLU_G" label="Glutamic Acid"/>
+			<node id="ALA_G" label="Alanine"/>
+			<node id="SER_G" label="Serine"/>
+			<node id="ASP_G" label="Aspartic Acid"/>
+			<node id="ASPG_G" label="Asparagine"/>
+			<node id="HYP" label="Hydroxyproline"/>
+
+			<node id="LIP" label="Lipid"/>
+			<node id="FASAT" label="Fatty acids, saturated"/>
+			<node id="FAMNUS" label="Fatty acids, monounsaturated"/>
+			<node id="FAPLUS" label="Fatty acids, polyunsaturated"/>
+			<node id="F1D0" label="1:0"/>
+			<node id="F2D0" label="2:0"/>
+			<node id="F3D0" label="3:0"/>
+			<node id="F4D0" label="4:0"/>
+			<node id="F6D0" label="6:0"/>
+			<node id="F8D0" label="8:0"/>
+			<node id="F10D0" label="10:0"/>
+			<node id="F12D0" label="12:0"/>
+			<node id="F13D0" label="13:0"/>
+			<node id="F14D0" label="14:0"/>
+			<node id="F15D0" label="15:0"/>
+			<node id="F16D0" label="16:0"/>
+			<node id="F17D0" label="17:0"/>
+			<node id="F18D0" label="18:0"/>
+			<node id="F20D0" label="20:0"/>
+			<node id="F22D0" label="22:0"/>
+			<node id="F24D0" label="24:0"/>
+			<node id="F12D1" label="12:1"/>
+			<node id="F14D1" label="14:1"/>
+			<node id="F15D1" label="15:1"/>
+			<node id="F16D1" label="16:1"/>
+			<node id="F17D1" label="17:1"/>
+			<node id="F18D1" label="18:1"/>
+			<node id="F20D1" label="20:1"/>
+			<node id="F22D1" label="22:1"/>
+			<node id="F24D1" label="24:1"/>
+			<node id="F18D2" label="18:2"/>
+			<node id="F18D3" label="18:3"/>
+			<node id="F18D4" label="18:4"/>
+			<node id="F20D3" label="20:3"/>
+			<node id="F20D4" label="20:4"/>
+			<node id="F21D5" label="20:5"/>
+			<node id="F22D4" label="22:4"/>
+			<node id="F22D5" label="22:5"/>
+			<node id="F22D6" label="22:6"/>
+
+			<node id="MNL" label="Mineral"/>
+			<node id="CA" label="Calcium"/>
+			<node id="MG" label="Magnesium"/>
+			<node id="P" label="Phosphorus"/>
+			<node id="NA" label="Sodium"/>
+			<node id="K" label="Potassium"/>
+			<node id="FE" label="Iron"/>
+			<node id="ZN" label="Zinc"/>
+			<node id="CU" label="Copper"/>
+			<node id="SE" label="Selenium"/>
+			<node id="I" label="Iodine"/>
+			<node id="MN" label="Manganese"/>
+			<node id="MO" label="Molybdenum"/>
+			<node id="F" label="Fluorine"/>
+			<node id="CR" label="Chromium"/>
+
+			<node id="VIT" label="Vitamin"/>
+			<node id="VITA" label="Vitamin A"/>
+			<node id="RETOL" label=""
+	</graph>
+</gexf>
