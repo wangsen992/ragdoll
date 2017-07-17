@@ -3,6 +3,7 @@
   <graph defaultedgetype="directed" mode="static">
     <nodes>
       <node id="NUT" label="Nutrition" />
+      <node id="WATER" label="Water" />
       <node id="CBH" label="Carbohydrate" />
       <node id="MACC" label="Monosaccharide" />
       <node id="DACC" label="Disaccharide" />
@@ -94,7 +95,7 @@
       <node id="CA" label="Calcium" />
       <node id="MG" label="Magnesium" />
       <node id="P" label="Phosphorus" />
-      <node id="nan" label="Sodium" />
+      <node id="NA" label="Sodium" />
       <node id="K" label="Potassium" />
       <node id="FE" label="Iron" />
       <node id="ZN" label="Zinc" />
@@ -152,7 +153,7 @@
         <edge id="0" source="MACC" target="CBH"/>
         <edge id="1" source="DACC" target="CBH"/>
         <edge id="2" source="PACC" target="CBH"/>
-        <edge id="3" soruce="GLUS" target="MACC"/>
+        <edge id="3" source="GLUS" target="MACC"/>
         <edge id="4" source="FRUS" target="MACC"/>
         <edge id="5" source="GALS" target="MACC"/>
         <edge id="6" source="LACS" target="DACC"/>
@@ -293,6 +294,7 @@
         <edge id="202" source="LIP" target="NUT"/>
         <edge id="203" source="VIT" target="NUT"/>
         <edge id="204" source="MNL" target="NUT"/>
+        <edge id="205" source="WATER" target="NUT"/>
     </edges>
   </graph>
 </gexf>
