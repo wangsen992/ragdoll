@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf version="1.1" xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+  <graph defaultedgetype="directed" mode="static">
+    <nodes>
+      <node id="NUT" label="Nutrition" />
+      <node id="CBH" label="Carbohydrate" />
+      <node id="MACC" label="Monosaccharide" />
+      <node id="DACC" label="Disaccharide" />
+      <node id="PACC" label="Polysaccharide" />
+      <node id="GLUS" label="Glucose" />
+      <node id="FRUS" label="Fructose" />
+      <node id="GALS" label="Galactose" />
+      <node id="LACS" label="Lactose" />
+      <node id="MALS" label="Maltose" />
+      <node id="SUCS" label="Sucrose" />
+      <node id="FIBTG" label="Dietary Fiber" />
+      <node id="STARCH" label="Starch" />
+      <node id="PROCNT" label="Protein" />
+      <node id="AA" label="Amino Acid" />
+      <node id="IAA" label="Indispensable Amino Acid" />
+      <node id="CIAA" label="Conditionally Indispensable Amino Acid" />
+      <node id="DAA" label="Dispensable Amino Acid" />
+      <node id="VAL_G" label="Valine" />
+      <node id="ILE_G" label="Isoleucine" />
+      <node id="LEU_G" label="Leucine" />
+      <node id="LYS_G" label="Lysine" />
+      <node id="MET_G" label="Methionine" />
+      <node id="PHE_G" label="Phenylanine" />
+      <node id="THR_G" label="Threonine" />
+      <node id="TRP_G" label="Tryptophan" />
+      <node id="HISTN_G" label="Histidine" />
+      <node id="GLY_G" label="Glycine" />
+      <node id="ARG_G" label="Arginine" />
+      <node id="GLN_G" label="Glutamine" />
+      <node id="PRO_G" label="Proline" />
+      <node id="CYS_G" label="Cystine" />
+      <node id="TYR_G" label="Tryosine" />
+      <node id="TAU_G" label="Taurine" />
+      <node id="ORN_G" label="Ornithine" />
+      <node id="CIT_G" label="Citrulline" />
+      <node id="GLU_G" label="Glutamic Acid" />
+      <node id="ALA_G" label="Alanine" />
+      <node id="SER_G" label="Serine" />
+      <node id="ASP_G" label="Aspartic Acid" />
+      <node id="ASPG_G" label="Asparagine" />
+      <node id="HYP" label="Hydroxyproline" />
+      <node id="LIP" label="Lipid" />
+      <node id="FASAT" label="Fatty acids, saturated" />
+      <node id="FAMNUS" label="Fatty acids, monounsaturated" />
+      <node id="FAPLUS" label="Fatty acids, polyunsaturated" />
+      <node id="F1D0" label="1:0" />
+      <node id="F2D0" label="2:0" />
+      <node id="F3D0" label="3:0" />
+      <node id="F4D0" label="4:0" />
+      <node id="F6D0" label="6:0" />
+      <node id="F8D0" label="8:0" />
+      <node id="F10D0" label="10:0" />
+      <node id="F12D0" label="12:0" />
+      <node id="F13D0" label="13:0" />
+      <node id="F14D0" label="14:0" />
+      <node id="F15D0" label="15:0" />
+      <node id="F16D0" label="16:0" />
+      <node id="F17D0" label="17:0" />
+      <node id="F18D0" label="18:0" />
+      <node id="F20D0" label="20:0" />
+      <node id="F22D0" label="22:0" />
+      <node id="F24D0" label="24:0" />
+      <node id="F12D1" label="12:1" />
+      <node id="F14D1" label="14:1" />
+      <node id="F15D1" label="15:1" />
+      <node id="F16D1" label="16:1" />
+      <node id="F17D1" label="17:1" />
+      <node id="F18D1" label="18:1" />
+      <node id="F20D1" label="20:1" />
+      <node id="F22D1" label="22:1" />
+      <node id="F24D1" label="24:1" />
+      <node id="F18D2" label="18:2" />
+      <node id="F18D3" label="18:3" />
+      <node id="F18D4" label="18:4" />
+      <node id="F20D3" label="20:3" />
+      <node id="F20D4" label="20:4" />
+      <node id="F20D5" label="20:5" />
+      <node id="F21D5" label="21:5" />
+      <node id="F22D4" label="22:4" />
+      <node id="F22D5" label="22:5" />
+      <node id="F22D6" label="22:6" />
+      <node id="STR" label="Sterol" />
+      <node id="CHOLE" label="Cholesterol" />
+      <node id="PHYSTR" label="Phytosterol" />
+      <node id="STID7" label="Stigmasterol" />
+      <node id="CAMD5" label="Campesterol" />
+      <node id="SITSTR" label="Beta-sitosterol" />
+      <node id="MNL" label="Mineral" />
+      <node id="CA" label="Calcium" />
+      <node id="MG" label="Magnesium" />
+      <node id="P" label="Phosphorus" />
+      <node id="nan" label="Sodium" />
+      <node id="K" label="Potassium" />
+      <node id="FE" label="Iron" />
+      <node id="ZN" label="Zinc" />
+      <node id="CU" label="Copper" />
+      <node id="SE" label="Selenium" />
+      <node id="I" label="Iodine" />
+      <node id="MN" label="Manganese" />
+      <node id="MO" label="Molybdenum" />
+      <node id="F" label="Fluorine" />
+      <node id="CR" label="Chromium" />
+      <node id="VIT" label="Vitamin" />
+      <node id="VITA" label="Vitamin A" />
+      <node id="RETOL" label="Retinol" />
+      <node id="CARTB" label="Carotene, beta" />
+      <node id="CARTA" label="Carotene, alpha" />
+      <node id="VITB" label="Vitamin B" />
+      <node id="VITB1" label="Vitamin B1" />
+      <node id="THIA" label="Thiamin" />
+      <node id="VITB2" label="Vitamin B2" />
+      <node id="RIBF" label="Riboflavin" />
+      <node id="VITB6" label="Vitamin B6" />
+      <node id="PYINE" label="Pyridoxine" />
+      <node id="PYXAL" label="Pyridoxal" />
+      <node id="PYMINE" label="Pyridoxamine" />
+      <node id="VITB12" label="Vitamin B12" />
+      <node id="COBA" label="Cobalamin" />
+      <node id="PANTAC" label="Pantothenic Acid" />
+      <node id="VITC" label="Vitamin C" />
+      <node id="ASCA" label="Ascorbic Acid" />
+      <node id="VITD" label="Vitamin D" />
+      <node id="VITD2" label="Vitamin D2" />
+      <node id="ERGCAL" label="Ergocalciferol" />
+      <node id="VITD3" label="Vitamin D3" />
+      <node id="CHOCAL" label="Cholecalciferol" />
+      <node id="VITE" label="Vitamin E" />
+      <node id="TOCPHA" label="Tocopherol, alpha" />
+      <node id="TOCPHB" label="Tocopherol, beta" />
+      <node id="TOCPHG" label="Tocopherol, gamma" />
+      <node id="TOCPHD" label="Tocopherol, delta" />
+      <node id="TOCTA" label="Tocotrienol, alpha" />
+      <node id="TOCTB" label="Tocotrienol, beta" />
+      <node id="TOCTG" label="Tocotrienol, gamma" />
+      <node id="TOCTD" label="Tocotrienol, delta" />
+      <node id="VITH" label="Vitamin H" />
+      <node id="BIOT" label="Biotin" />
+      <node id="VITK" label="Vitamin K" />
+      <node id="PHYQ" label="Phylloquinone" />
+      <node id="MK" label="Menaquinones" />
+      <node id="MENAD" label="Menadiol" />
+      <node id="MENADD" label="Menadiol Diacetate" />
+      <node id="NIA" label="Niacin" />
+      <node id="FOLAC" label="Folic Acid" />
+    </nodes>
+    <edges>
+        <edge id="0" source="MACC" target="CBH"/>
+        <edge id="1" source="DACC" target="CBH"/>
+        <edge id="2" source="PACC" target="CBH"/>
+        <edge id="3" soruce="GLUS" target="MACC"/>
+        <edge id="4" source="FRUS" target="MACC"/>
+        <edge id="5" source="GALS" target="MACC"/>
+        <edge id="6" source="LACS" target="DACC"/>
+        <edge id="7" source="MALS" target="DACC"/>
+        <edge id="8" source="SUCS" target="DACC"/>
+        <edge id="9" source="FIBTG" target="PACC"/>
+        <edge id="10" source="STARCH" target="PACC"/>
+        <edge id="11" source="AA" target="PROCNT"/>
+        <edge id="12" source="IAA" target="AA"/>
+        <edge id="13" source="CIAA" target="AA"/>
+        <edge id="14" source="DAA" target="AA"/>
+        <edge id="15" source="VAL_G" target="IAA"/>
+        <edge id="16" source="ILE_G" target="IAA"/>
+        <edge id="17" source="LEU_G" target="IAA"/>
+        <edge id="18" source="LYS_G" target="IAA"/>
+        <edge id="19" source="MET_G" target="IAA"/>
+        <edge id="20" source="PHE_G" target="IAA"/>
+        <edge id="21" source="THR_G" target="IAA"/>
+        <edge id="22" source="TRP_G" target="IAA"/>
+        <edge id="23" source="HISTN_G" target="IAA"/>
+        <edge id="24" source="GLY_G" target="CIAA"/>
+        <edge id="25" source="ARG_G" target="CIAA"/>
+        <edge id="26" source="GLN_G" target="CIAA"/>
+        <edge id="27" source="PRO_G" target="CIAA"/>
+        <edge id="28" source="CYS_G" target="CIAA"/>
+        <edge id="29" source="TYR_G" target="CIAA"/>
+        <edge id="30" source="TAU_G" target="CIAA"/>
+        <edge id="31" source="ORN_G" target="CIAA"/>
+        <edge id="32" source="CIT_G" target="CIAA"/>
+        <edge id="33" source="GLU_G" target="DAA"/>
+        <edge id="34" source="ALA_G" target="DAA"/>
+        <edge id="35" source="SER_G" target="DAA"/>
+        <edge id="36" source="ASP_G" target="DAA"/>
+        <edge id="37" source="ASPG_G" target="DAA"/>
+        <edge id="38" source="HYP" target="DAA"/>
+        <edge id="39" source="FASAT" target="LIP"/>
+        <edge id="40" source="FAMNUS" target="LIP"/>
+        <edge id="41" source="FAPLUS" target="LIP"/>
+        <edge id="42" source="F1D0" target="FASAT"/>
+        <edge id="43" source="F2D0" target="FASAT"/>
+        <edge id="44" source="F3D0" target="FASAT"/>
+        <edge id="45" source="F4D0" target="FASAT"/>
+        <edge id="46" source="F6D0" target="FASAT"/>
+        <edge id="47" source="F8D0" target="FASAT"/>
+        <edge id="48" source="F10D0" target="FASAT"/>
+        <edge id="49" source="F12D0" target="FASAT"/>
+        <edge id="50" source="F13D0" target="FASAT"/>
+        <edge id="51" source="F14D0" target="FASAT"/>
+        <edge id="52" source="F15D0" target="FASAT"/>
+        <edge id="53" source="F16D0" target="FASAT"/>
+        <edge id="54" source="F17D0" target="FASAT"/>
+        <edge id="55" source="F18D0" target="FASAT"/>
+        <edge id="56" source="F20D0" target="FASAT"/>
+        <edge id="57" source="F22D0" target="FASAT"/>
+        <edge id="58" source="F24D0" target="FASAT"/>
+        <edge id="59" source="F12D1" target="FAMNUS"/>
+        <edge id="60" source="F14D1" target="FAMNUS"/>
+        <edge id="61" source="F15D1" target="FAMNUS"/>
+        <edge id="62" source="F16D1" target="FAMNUS"/>
+        <edge id="63" source="F17D1" target="FAMNUS"/>
+        <edge id="64" source="F18D1" target="FAMNUS"/>
+        <edge id="65" source="F20D1" target="FAMNUS"/>
+        <edge id="66" source="F22D1" target="FAMNUS"/>
+        <edge id="67" source="F24D1" target="FAMNUS"/>
+        <edge id="68" source="F18D2" target="FAPLUS"/>
+        <edge id="69" source="F18D3" target="FAPLUS"/>
+        <edge id="70" source="F18D4" target="FAPLUS"/>
+        <edge id="71" source="F20D3" target="FAPLUS"/>
+        <edge id="72" source="F20D4" target="FAPLUS"/>
+        <edge id="73" source="F20D5" target="FAPLUS"/>
+        <edge id="74" source="F21D5" target="FAPLUS"/>
+        <edge id="75" source="F22D4" target="FAPLUS"/>
+        <edge id="76" source="F22D5" target="FAPLUS"/>
+        <edge id="77" source="F22D6" target="FAPLUS"/>
+        <edge id="78" source="CA" target="MNL"/>
+        <edge id="79" source="MG" target="MNL"/>
+        <edge id="80" source="P" target="MNL"/>
+        <edge id="81" source="NA" target="MNL"/>
+        <edge id="82" source="K" target="MNL"/>
+        <edge id="83" source="FE" target="MNL"/>
+        <edge id="84" source="ZN" target="MNL"/>
+        <edge id="85" source="CU" target="MNL"/>
+        <edge id="86" source="SE" target="MNL"/>
+        <edge id="87" source="I" target="MNL"/>
+        <edge id="88" source="MN" target="MNL"/>
+        <edge id="89" source="MO" target="MNL"/>
+        <edge id="90" source="F" target="MNL"/>
+        <edge id="91" source="CR" target="MNL"/>
+        <edge id="92" source="VITA" target="VIT"/>
+        <edge id="93" source="RETOL" target="VITA"/>
+        <edge id="94" source="CARTA" target="VITA"/>
+        <edge id="95" source="CARTB" target="VITB"/>
+        <edge id="96" source="VITB" target="VIT"/>
+        <edge id="97" source="VITB1" target="VITB"/>
+        <edge id="98" source="THIA" target="VITB1"/>
+        <edge id="99" source="VITB2" target="VITB"/>
+        <edge id="100" source="RIBF" target="VITB2"/>
+        <edge id="101" source="VITB6" target="VITB"/>
+        <edge id="102" source="PYINE" target="VITB6"/>
+        <edge id="103" source="PYXAL" target="VITB6"/>
+        <edge id="104" source="PYMINE" target="VITB6"/>
+        <edge id="105" source="VITB12" target="VIT"/>
+        <edge id="106" source="COBA" target="VITB12"/>
+        <edge id="107" source="PANTAC" target="VITB12"/>
+        <edge id="108" source="VITC" target="VIT"/>
+        <edge id="109" source="ASCA" target="VITC"/>
+        <edge id="110" source="VITD" target="VIT"/>
+        <edge id="111" source="VITD2" target="VITD"/>
+        <edge id="112" source="ERGCAL" target="VITD2"/>
+        <edge id="113" source="VITD3" target="VITD"/>
+        <edge id="114" source="CHOCAL" target="VITD3"/>
+        <edge id="115" source="VITE" target="VIT"/>
+        <edge id="116" source="TOCPHA" target="VITE"/>
+        <edge id="117" source="TOCPHB" target="VITE"/>
+        <edge id="118" source="TOCPHG" target="VITE"/>
+        <edge id="119" source="TOCPHD" target="VITE"/>
+        <edge id="120" source="TOCTA" target="VITE"/>
+        <edge id="121" source="TOCTB" target="VITE"/>
+        <edge id="122" source="TOCTG" target="VITE"/>
+        <edge id="123" source="TOCTD" target="VITE"/>
+        <edge id="124" source="VITH" target="VIT"/>
+        <edge id="125" source="BIOT" target="VITH"/>
+        <edge id="126" source="VITK" target="VIT"/>
+        <edge id="127" source="PHYQ" target="VITK"/>
+        <edge id="128" source="MK" target="VITK"/>
+        <edge id="129" source="MENAD" target="VITK"/>
+        <edge id="130" source="MENADD" target="VITK"/>
+        <edge id="131" source="STR" target="LIP"/>
+        <edge id="132" source="CHOLE" target="STR"/>
+        <edge id="133" source="PHYSTR" target="STR"/>
+        <edge id="134" source="STID7" target="STR"/>
+        <edge id="135" source="CAMD5" target="STR"/>
+        <edge id="136" source="SITSTR" target="STR"/>
+        <edge id="137" source="NIA" target="VIT"/>
+        <edge id="138" source="FOLAC" target="VIT"/>
+        <edge id="200" source="CBH" target="NUT"/>
+        <edge id="201" source="PROCNT" target="NUT"/>
+        <edge id="202" source="LIP" target="NUT"/>
+        <edge id="203" source="VIT" target="NUT"/>
+        <edge id="204" source="MNL" target="NUT"/>
+    </edges>
+  </graph>
+</gexf>
