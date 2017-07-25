@@ -962,7 +962,7 @@ class Component(object):
 	def __init__(self, name="unknown"):
 
 		self.name = name
-		self.value = 0
+		self.value = 100
 		self.unit = 'g'
 		self.children = OrderedDict()
 		self.nutrients = Nutrients()
@@ -980,6 +980,33 @@ class Component(object):
 
 		else:
 			return True
+    
+    @staticmethod
+    def concat(list_of_comps):
+        
+        """Concatenate a list of components
+        
+        Ingredient and Meal are treated the same, basket is expands to 
+        first-level children when concatenated. A basket component is 
+        returned.
+        
+        list_of_comps: list
+            A list of sub-Component objects.
+        """
+        
+        list_of_baskets = [comp for comp in list_of_comps if type(comp) == BasketComponent]
+        basket_item_list = []
+        
+        for basket in list_of_baskets:
+            basket_item_list.extend(list(basket.children.values()))
+        
+        list_of_items = [comp for comp in list_of_comps if type(comp) != BasketComponent].extend(basket_item_list)
+        
+        return BasketComponent(name='',
+                               children=list_of_items,
+                               unit='g')
+    
+        
 
 	def add(self, other):
 
