@@ -1005,7 +1005,23 @@ class Component(object):
         return BasketComponent(name='',
                                children=list_of_items,
                                unit='g')
-    
+
+    @staticmethod
+    def addition(list_of_comps):
+        
+        """Addition of components of the same type"""
+        
+        common_type = type(list_of_comps[0])
+        if common_type not in [IngredientComponent, MealComponent]:
+            raise TypeError("Type of elements must be either IngredientComponent or MealComponent.")
+        
+        # check the types of the elements
+        for comp in list_of_comps[1:]:
+            if type(comp) != common_type:
+                raise TypeError("Types of elements not consistent.")
+        
+        # addition operation
+        pass
         
 
 	def add(self, other):
