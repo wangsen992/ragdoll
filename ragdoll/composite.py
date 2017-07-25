@@ -16,13 +16,27 @@ extension with more databases.
 import pandas as pd
 
 from collections import defaultdict, OrderedDict
- 
+
 
 # format string used for representation of things
 title_format_str = "{abbr:<10s} {value:<10} {unit:<10s} {name:<15s}\n"
 entry_format_str = "{abbr:<10s} {value:<10.2f} {unit:<10s} {name:<15s}\n"
 recipe_title_format_str = "{index:<5} {value:<10} {unit:<5s} {db:10s} {name: <20s}\n"
 recipe_entry_format_str = "{index:<5} {value:<10.1f} {unit:<5s} {db:10s} {name: <20s}\n"
+
+# standard nutrient list order
+std_nut = ['PROCNT', 'CBH', 'LIP', 'FIBTG', 'CHOLE', 'VITA', 'VITC', 'VITE',
+		   'RIBF', 'NIA', 'THIA',
+		   'SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU']
+macro_nut = ['PROCNT', 'CBH', 'LIP']
+vit_nut = ['VITA', 'VITC', 'VITE', 'RIBF', 'NIA', 'THIA']
+min_nut = ['SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU']
+
+# module wise functions
+def key_matching(key_set1, key_set2, order=std_nut):
+
+	return [key for key in std_nut if key in key_set1 and key in key_set2]
+
 
 class Nutrient(object):
 	"""A basic concrete class for handling nutrient-level operations.
@@ -641,7 +655,7 @@ class Nutrients(object):
 
 
 
-	def add(self, other, method="intersect"):
+	def add(self, other):
 		"""Addition with another Nutrients object
 
 		Performs summation between two Nutrients objects. When two Nutrients
@@ -653,9 +667,6 @@ class Nutrients(object):
 		----------
 		other : Nutrients
 			The other Nutrients object to be added.
-		method : str
-			Method for managing mismatching Nutrient objects within both
-			Nutrients objects. Default "intersect"
 
 		Returns
 		-------
@@ -672,48 +683,30 @@ class Nutrients(object):
 				raise TypeError("Second argument not Nutrients object")
 
 		# Initiate a new dictionary for addition.
-		newNutrients_dict = OrderedDict()
+		newNutrients_list = []
 
-		# Obtain the keys from both Nutrients objects. 
-		self_keys = self.nutrients.keys()
-		other_keys = other.nutrients.keys()
+		# Obtain the keys from both Nutrients objects.
+		ordered_keys = key_matching(self.keys(), other.keys())
 
 		# Perform addition.
-		if method == "union":
 
-			for abbr in self_keys | other_keys:
+		for abbr in ordered_keys:
 
-				if abbr in self_keys & other_keys:
+			newNutrients_list.append(self.nutrients[abbr] + other.nutrients[abbr])
 
-					newNutrients_dict[abbr] = self.nutrients[abbr] + other.nutrients[abbr]
-
-				elif abbr in self_keys and abbr not in other_keys:
-
-					newNutrients_dict[abbr] = self.nutrients[abbr]
-
-				elif abbr not in self_keys and abbr in other_keys:
-
-					newNutrients_dict[abbr] = other.nutrients[abbr]
-
-		elif method == "intersect":
-
-			for abbr in self_keys & other_keys:
-
-				newNutrients_dict[abbr] = self.nutrients[abbr] + other.nutrients[abbr]
-
-		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
+		return Nutrients(input_nutrients=newNutrients_list)
 
 	def __add__(self, other):
 		"""Wrapper function of self.add for operation overloading on "+". """
 
-		return self.add(other, method="intersect")
+		return self.add(other)
 
 	def __radd__(self, other):
 		"""Wrapper function of self.add for operation overloading on "+". """
 
-		return self.add(other, method="intersect")
+		return self.add(other)
 
-	def sub(self, other, method="intersect"):
+	def sub(self, other):
 		"""Subtraction of another Nutrients object
 
 		Performs subtraction between two Nutrients objects. When two Nutrients
@@ -739,39 +732,22 @@ class Nutrients(object):
 		if type(other) != Nutrients:
 			raise TypeError("Second argument not Nutrients object")
 
-		newNutrients_dict = OrderedDict()
+		newNutrients_list = []
 
-		self_keys = self.nutrients.keys()
-		other_keys = other.nutrients.keys()
+		# Obtain the keys from both Nutrients objects.
+		ordered_keys = key_matching(self.keys(), other.keys())
 
-		if method == "union":
 
-			for abbr in self_keys | other_keys:
+		for abbr in ordered_keys:
 
-				if abbr in self_keys & other_keys:
+			newNutrients_list.append(self.nutrients[abbr] - other.nutrients[abbr])
 
-					newNutrients_dict[abbr] = self.nutrients[abbr] - other.nutrients[abbr]
-
-				elif abbr in self_keys and abbr not in other_keys:
-
-					newNutrients_dict[abbr] = self.nutrients[abbr]
-
-				elif abbr not in self_keys and abbr in other_keys:
-
-					newNutrients_dict[abbr] = float('-inf')
-
-		if method == "intersect":
-
-			for abbr in self_keys & other_keys:
-
-				newNutrients_dict[abbr] = self.nutrients[abbr] - other.nutrients[abbr]
-
-		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
+		return Nutrients(input_nutrients=newNutrients_list)
 
 	def __sub__(self, other):
 		"""Wrapper function of self.sub for operation overloading on "-". """
 
-		return self.sub(other, method="intersect")
+		return self.sub(other)
 
 
 	def __mul__(self, scalar):
@@ -799,20 +775,20 @@ class Nutrients(object):
 
 		assert (scalar >= 0), "Scalar must be equal or larger than zero!"
 
-		newNutrients_dict = OrderedDict()
+		newNutrients_list = []
 
 		for abbr in self.nutrients.keys():
 
-			newNutrients_dict[abbr] = self.nutrients[abbr] * scalar
+			newNutrients_list(self.nutrients[abbr] * scalar)
 
-		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
+		return Nutrients(input_nutrients=newNutrients_list)
 
 	def __rmul__(self, scalar):
 		"""Wrapper function of self.__mul__ for operation overloading on "*"."""
 
 		return self.__mul__(scalar)
 
-	def __truediv__(self, other, method='intersect'):
+	def __truediv__(self, other):
 		"""Division of a scalar.
 
 		Note
@@ -835,7 +811,7 @@ class Nutrients(object):
 		if type(other) not in [int, float, Nutrients]:
 			raise ValueError("Must be multiplied with a scalar or a Nutrients object.")
 
-		newNutrients_dict = OrderedDict()
+		newNutrients_list = []
 
 		if type(other) in [int, float]:
 
@@ -843,15 +819,15 @@ class Nutrients(object):
 
 			for abbr in self.nutrients.keys():
 
-				newNutrients_dict[abbr] = self.nutrients[abbr] / other
+				newNutrients_list.append(self.nutrients[abbr] / other)
 
 		else:
 
-			if method == 'intersect':
-				for abbr in self.keys() & other.keys():
-					newNutrients_dict[abbr] = self.nutrients[abbr] / other.nutrients[abbr]
-			elif method == 'union':
-				raise ValueError("union can't be performed.")
+			# Obtain the keys from both Nutrients objects.
+			ordered_keys = key_matching(self.keys(), other.keys())
+
+			for abbr in ordered_keys:
+				newNutrients_list.append(self.nutrients[abbr] / other.nutrients[abbr])
 
 		return Nutrients(input_nutrients=list(newNutrients_dict.values()))
 
@@ -1084,24 +1060,6 @@ class Component(object):
 
 		self.meta[key] = value
 
-	def list_nutrients(self):
-
-		return [nut.name for nut in self.nutrients.nutrients.values()]
-
-	def display_macro(self):
-
-		pass
-
-	def display_minerals(self):
-
-		mineral_nut_abbr = ['CA', 'FE', 'MG', 'P', 'K', 'NA', 'ZN', 'CU', 'FLD',
-							'MN', 'SE']
-
-		for key in mineral_nut_abbr:
-			try:
-				print(self.nutrients.nutrients[key])
-			except:
-				continue
 
 
 class IngredientComponent(Component):

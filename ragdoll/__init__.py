@@ -4,9 +4,7 @@ Ragdoll initialisation.
 
 from .db import *
 from .composite import *
-from .component import *
-from .nutrient import *
-from .flyweight import *
+from .loader import *
 from .dictionary import *
 from .human import *
 from .req import *
