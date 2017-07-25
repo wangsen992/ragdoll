@@ -1,0 +1,148 @@
+abbr,name
+ENERC_KCAL,Energy
+CBH,Carbohydrate
+MACC,Monosaccharide
+DACC,Disaccharide
+PACC,Polysaccharide
+GLUS,Glucose
+FRUS,Fructose
+GALS,Galactose
+LACS,Lactose
+MALS,Maltose
+SUCS,Sucrose
+FIBTG,Dietary Fiber
+STARCH,Starch
+PROCNT,Protein
+AA,Amino Acid
+IAA,Indispensable Amino Acid
+CIAA,Conditionally Indispensable Amino Acid
+DAA,Dispensable Amino Acid
+VAL_G,Valine
+ILE_G,Isoleucine
+LEU_G,Leucine
+LYS_G,Lysine
+MET_G,Methionine
+PHE_G,Phenylanine
+THR_G,Threonine
+TRP_G,Tryptophan
+HISTN_G,Histidine
+GLY_G,Glycine
+ARG_G,Arginine
+GLN_G,Glutamine
+PRO_G,Proline
+CYS_G,Cystine
+TYR_G,Tryosine
+TAU_G,Taurine
+ORN_G,Ornithine
+CIT_G,Citrulline
+GLU_G,Glutamic Acid
+ALA_G,Alanine
+SER_G,Serine
+ASP_G,Aspartic Acid
+ASPG_G,Asparagine
+HYP,Hydroxyproline
+LIP,Lipid
+FASAT,"Fatty acids, saturated"
+FAMNUS,"Fatty acids, monounsaturated"
+FAPLUS,"Fatty acids, polyunsaturated"
+F1D0,1:0
+F2D0,2:0
+F3D0,3:0
+F4D0,4:0
+F6D0,6:0
+F8D0,8:0
+F10D0,10:0
+F12D0,12:0
+F13D0,13:0
+F14D0,14:0
+F15D0,15:0
+F16D0,16:0
+F17D0,17:0
+F18D0,18:0
+F20D0,20:0
+F22D0,22:0
+F24D0,24:0
+F12D1,12:1
+F14D1,14:1
+F15D1,15:1
+F16D1,16:1
+F17D1,17:1
+F18D1,18:1
+F20D1,20:1
+F22D1,22:1
+F24D1,24:1
+F18D2,18:2
+F18D3,18:3
+F18D4,18:4
+F20D3,20:3
+F20D4,20:4
+F20D5,20:5
+F21D5,21:5
+F22D4,22:4
+F22D5,22:5
+F22D6,22:6
+STR,Sterol
+CHOLE,Cholesterol
+PHYSTR,Phytosterols
+STID7,Stigmasterol
+CAMD5,Campesterol
+SITSTR,Beta-sitosterol
+MNL,Mineral
+CA,Calcium
+MG,Magnesium
+P,Phosphorus
+NA,Sodium
+K,Potassium
+FE,Iron
+ZN,Zinc
+CU,Copper
+SE,Selenium
+I,Iodine
+MN,Manganese
+MO,Molybdenum
+F,Fluorine
+CR,Chromium
+VIT,Vitamin
+VITA,Vitamin A
+VITA_RAE,Vitamin A Retinol Equivalent
+RETOL,Retinol
+CART,Carotene
+CARTB,"Carotene, beta"
+CARTA,"Carotene, alpha"
+VITB,Vitamin B
+VITB1,Vitamin B1
+THIA,Thiamin
+VITB2,Vitamin B2
+RIBF,Riboflavin
+VITB6,Vitamin B6
+PYINE,Pyridoxine
+PYXAL,Pyridoxal
+PYMINE,Pyridoxamine
+VITB12,Vitamin B12
+COBA,Cobalamin
+PANTAC,Pantothenic Acid
+VITC,Vitamin C
+ASCA,Ascorbic Acid
+VITD,Vitamin D
+VITD2,Vitamin D2
+ERGCAL,Ergocalciferol
+VITD3,Vitamin D3
+CHOCAL,Cholecalciferol
+VITE,Vitamin E
+TOCPHA,"Tocopherol, alpha"
+TOCPHB,"Tocopherol, beta"
+TOCPHG,"Tocopherol, gamma"
+TOCPHD,"Tocopherol, delta"
+TOCTA,"Tocotrienol, alpha"
+TOCTB,"Tocotrienol, beta"
+TOCTG,"Tocotrienol, gamma"
+TOCTD,"Tocotrienol, delta"
+VITH,Vitamin H
+BIOT,Biotin
+VITK,Vitamin K
+PHYQ,Phylloquinone
+MK,Menaquinones
+MENAD,Menadiol
+MENADD,Menadiol Diacetate
+NIA,Niacin
+FOLAC,Folic Acid

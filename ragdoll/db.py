@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from .composite import *
+from .loader import *
 
 nut_dict_file = "{root}/ragdoll/NUTR_DEF_more.csv".format(root=os.getcwd())
 nut_dict_df = pd.read_csv(nut_dict_file, keep_default_na=False)
@@ -288,12 +289,12 @@ class RetrieveItemVisitor(Visitor):
 
         def __ingredient_constructor(ing_doc):
 
-            name = ing_doc['name']
+            name = ing_doc['name']['long']
             value = 100
             unit = 'g'
             nutrient_list = []
 
-            for nutrient in ing_doc['nutrients'].items():
+            for nutrient in ing_doc['nutrients']:
                 nutrient_list.append(__nutrient_constructor(nutrient))
 
             nutrients = Nutrients(input_nutrients=nutrient_list)
@@ -313,18 +314,10 @@ class RetrieveItemVisitor(Visitor):
 
         def __nutrient_constructor(nut_doc):
 
-            name, unit = nut_doc[0].split('(')
-            unit = unit[:-1]
-            value = nut_doc[1]
-            if np.isnan(value):
-                value = 0
-
-            condition = (nut_dict_df["name_{}".format(fm_node.col_name)] == name) \
-                        & (nut_dict_df["unit_{}".format(fm_node.col_name)] == unit)
-            nut_info = nut_dict_df[condition]
-            code = nut_info['code'].values[0]
-            abbr = nut_info['abbr'].values[0]
-
+            name = nut_doc['name']
+            unit = nut_doc['unit']
+            value = nut_doc['value']
+            abbr = nut_doc['abbr']
 
             return Nutrient(name=name, 
                             value=value, 

@@ -244,7 +244,7 @@ class Nutrient(object):
 
 			return Nutrient(name=self.name,
 							value=self.value / other.value,
-							unit=self.unit,
+							unit=" ",
 							abbr=self.abbr,
 							source=self.source,
 							name_source=self.name_source)
@@ -672,7 +672,7 @@ class Nutrients(object):
 				raise TypeError("Second argument not Nutrients object")
 
 		# Initiate a new dictionary for addition.
-		newNutrients_dict = dict()
+		newNutrients_dict = OrderedDict()
 
 		# Obtain the keys from both Nutrients objects. 
 		self_keys = self.nutrients.keys()
@@ -739,7 +739,7 @@ class Nutrients(object):
 		if type(other) != Nutrients:
 			raise TypeError("Second argument not Nutrients object")
 
-		newNutrients_dict = dict()
+		newNutrients_dict = OrderedDict()
 
 		self_keys = self.nutrients.keys()
 		other_keys = other.nutrients.keys()
@@ -799,7 +799,7 @@ class Nutrients(object):
 
 		assert (scalar >= 0), "Scalar must be equal or larger than zero!"
 
-		newNutrients_dict = dict()
+		newNutrients_dict = OrderedDict()
 
 		for abbr in self.nutrients.keys():
 
@@ -835,7 +835,7 @@ class Nutrients(object):
 		if type(other) not in [int, float, Nutrients]:
 			raise ValueError("Must be multiplied with a scalar or a Nutrients object.")
 
-		newNutrients_dict = dict()
+		newNutrients_dict = OrderedDict()
 
 		if type(other) in [int, float]:
 

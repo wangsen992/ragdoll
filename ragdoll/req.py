@@ -32,8 +32,8 @@ def Harris_Benedict_Revised(weight, height, age, gender, PAL):
     elif gender == 'female':
         value = (447.593 + 9.247 * weight + 3.098 * height - 4.330 * age) * PAL
     
-    BMR = Nutrient(name='热量',
-                   unit='千卡',
+    BMR = Nutrient(name='Energy',
+                   unit='kcal',
                    abbr='ENERC_KCAL',
                    source='Analytical',
                    name_source='Foodmate',
@@ -71,52 +71,39 @@ class Requirement(Nutrients):
         energy = self.nutrients.nutrients['ENERC_KCAL']
         AMRD = self.human.AMRD
 
-        prot = Nutrient(name="蛋白质",
-                        unit='克',
+        prot = Nutrient(name="Protein",
+                        unit='g',
                         value=energy.value * AMRD['PROCNT'] / 4.0,
                         abbr='PROCNT',
                         source='Analytical',
                         name_source='Foodmate')
-        carbs = Nutrient(name="碳水化合物",
-                         unit='克',
+        carbs = Nutrient(name="Carbohydrate",
+                         unit='g',
                          value=energy.value * AMRD['CHOCDF'] / 4.0,
-                         abbr='CHOCDF',
+                         abbr='CBH',
                          source='Analytical',
                          name_source="Foodmate")
-        fat = Nutrient(name="脂肪",
-                       unit='克',
+        fat = Nutrient(name="Lipid",
+                       unit='g',
                        value=energy.value * AMRD['FAT'] / 9.0,
-                       abbr='FAT',
+                       abbr='LIP',
                        source='Analytical',
                        name_source="Foodmate")
 
         self.nutrients.add_nutrients([prot, carbs, fat])
 
-    def get_micro(self, mongo, col_name):
-        "This mongo should be already initiated."
+    def get_micro(self):
 
-        micro_id = {'male': "5957e2b9c6d282587a308017",
-                    'female' : "5957e32bc6d282587a308018"}
-        
-        doc = list(mongo.database[col_name].find({"_id" : ObjectId(micro_id[self.human.gender])}))[0]
+        table = pd.read_csv('ragdoll/nut_doc/nut_req_{}.csv'.format(self.human.gender), 
+                            keep_default_na=False)
         nutrient_list = []
 
-        for nut, amt in doc['nutrients'].items():
-            name, unit = nut.split('(')
-            unit = unit[:-1]
-            value = amt
-
-            condition = (nut_dict_df["name_{}".format("Foodmate")] == name)\
-                        & (nut_dict_df["unit_{}".format("Foodmate")] == unit)
-
-            nut_info = nut_dict_df[condition]
-            code = nut_info['code'].values[0]
-            abbr = nut_info['abbr'].values[0]
-
-            nutrient = Nutrient(name=name, 
-                                 value=value, 
-                                 unit=unit, 
-                                 abbr=abbr,
+        for i in table.index:
+            nut = table.loc[i]
+            nutrient = Nutrient(name=str(nut['name']), 
+                                 value=float(nut['value']), 
+                                 unit=str(nut['unit']), 
+                                 abbr=str(nut['abbr']),
                                  source="old_req",
                                  name_source="Foodmate")
 

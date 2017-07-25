@@ -43,14 +43,14 @@ class Human(object):
         self.AMRD = AMRD
 
 
-    def get_req(self, mongo, col_name):
+    def get_req(self):
 
         req = Requirement(self)
         print(type(req))
 
         req.get_energy()
         req.get_macro()
-        req.get_micro(mongo, col_name)
+        req.get_micro()
 
         self.nutrients = req.nutrients
 

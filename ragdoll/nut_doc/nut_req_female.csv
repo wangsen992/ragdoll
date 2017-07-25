@@ -1,0 +1,17 @@
+abbr,name,unit,value
+CA,Calcium,mg,800
+MG,Magnesium,mg,330
+FE,Iron,mg,20
+MN,Manganese,mg,4.5
+ZN,Zinc,mg,7.5
+CU,Copper,mg,0.8
+K,Potassium,mg,2000
+P,Phosphorus,mg,720
+NA,Sodium,mg,1500
+SE,Selenium,µg,60
+VITA_RAE,Vitamin A Retinol Equivalent,µg,700
+THIA,Thiamin,mg,1.2
+RIBF,Riboflavin,mg,1.2
+NIA,Niacin,mg,12
+VITC,Vitamin C,mg,100
+VITE,Vitamin E,mg,14
