@@ -3,6 +3,7 @@ A simple draft for experimenting with a database construction.
 """
 import os
 import pymongo
+import random
 
 import numpy as np
 import pandas as pd
@@ -41,6 +42,15 @@ class MongoDB(object):
             raise Exception('Invalid database name in collections.')
         self.collections = collections
 
+    def retrieve_random(self, col_name, size):
+
+        col_cursor = self.database[col_name].find()
+        count = col_cursor.count()
+        index_sample = random.sample(range(count), size)
+
+        docs = [col_cursor[i] for i in index_sample]
+
+        return docs
 
     def retrieve_item(self, col_name, item_id):
         """Retrieve item as original doc"""

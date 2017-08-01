@@ -52,12 +52,30 @@ def update_usda_doc(doc):
 				'value' : vite_amt}
 	new_doc['nutrients'].append(vite_doc)
 
+	new_doc['group'] = doc['group']
+
 
 	return new_doc
 
 
 if __name__ == '__main__':
 	
-	ingre_doc = mongo.retrieve_item('USDA', "59451260c6d282587a30749a")
-	new_doc = update_usda_doc(ingre_doc)
-	ingre = Loader.ingre_loader(new_doc)
+	# ingre_doc = mongo.retrieve_item('USDA', "59451260c6d282587a30749a")
+	# new_doc = update_usda_doc(ingre_doc)
+	# ingre = Loader.ingre_loader(new_doc)
+
+	# get existing names for check
+	new_name_cursor = mongo.database['usda'].find(projection={'_id':0, 'name.long':1})
+	new_name_list = [doc['name']['long'] for doc in new_name_cursor]
+	print("current number of entries in usda : {}\n".format(len(new_name_list)))
+
+	# recreate a new usda
+
+	for doc in mongo.database['USDA'].find():
+
+		if doc['name']['long'] in new_name_list:
+			continue
+		new_doc = update_usda_doc(doc)
+		mongo.database['usda'].insert(new_doc)
+
+	print("Finished")

@@ -59,6 +59,12 @@ class Loader(object):
 
     #     return nutrients
 
+    def nutrients_loader(doc):
+
+        nut_list = [nutrient_constructor(nut_doc) for nut_doc in doc]
+
+        return Nutrients(input_nutrients=nut_list)
+
     @staticmethod
     def ingre_loader(doc, col_name='', item_id=''):
 

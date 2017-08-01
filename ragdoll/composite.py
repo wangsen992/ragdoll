@@ -26,13 +26,8 @@ recipe_entry_format_str = "{index:<5} {value:<10.1f} {unit:<5s} {db:10s} {name: 
 
 # standard nutrient list order
 std_nut = ['PROCNT', 'CBH', 'LIP', 'FIBTG', 'CHOLE', 'VITA', 'VITC', 'VITE',
-<<<<<<< HEAD
            'RIBF', 'NIA', 'THIA',
            'SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU']
-=======
-		   'RIBF', 'NIA', 'THIA',
-		   'SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU', 'P']
->>>>>>> 7b7f95e05cfc83ab7f4a23ae068209e0d9d0cd8d
 macro_nut = ['PROCNT', 'CBH', 'LIP']
 vit_nut = ['VITA', 'VITC', 'VITE', 'RIBF', 'NIA', 'THIA']
 min_nut = ['SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU']
@@ -133,7 +128,7 @@ class Nutrient(object):
 
         Note
         ----
-        This method currently enforces that : self.value >= other.value.
+        This method currently enforces that : self.value >= other.value. (deprecated)
 
         Parameters
         ----------
@@ -152,8 +147,6 @@ class Nutrient(object):
 
         assert self.__type_test(other), "Type mismatch between two nutrient objects."
 
-        assert (self.value >= other.value), "First nutrient value smaller than the second."
-
         source = self.source.copy()
         source.update(other.source)
 
@@ -170,7 +163,7 @@ class Nutrient(object):
 
         Note
         ----
-        This method currently enforces that : scalar >= 0
+        This method currently enforces that : scalar >= 0 (deprecated)
 
         Parameters
         ----------
@@ -261,9 +254,14 @@ class Nutrient(object):
 
         elif self.__type_test(other):
 
+            try:
+                value = self.value / other.value
+            except ZeroDivisionError:
+                value = float('nan')
+
             return Nutrient(name=self.name,
-                            value=self.value / other.value,
-                            unit=" ",
+                            value=value,
+                            unit="",
                             abbr=self.abbr,
                             source=self.source,
                             name_source=self.name_source)
@@ -755,7 +753,7 @@ class Nutrients(object):
         return self.sub(other)
 
 
-    def __mul__(self, scalar):
+    def multiply_scalar(self, scalar):
         """Multiplication with a scalar.
 
         Note
@@ -784,14 +782,19 @@ class Nutrients(object):
 
         for abbr in self.nutrients.keys():
 
-            newNutrients_list(self.nutrients[abbr] * scalar)
+            newNutrients_list.append(self.nutrients[abbr] * scalar)
 
         return Nutrients(input_nutrients=newNutrients_list)
+
+    def __mul__(self, scalar):
+
+        return self.multiply_scalar(scalar)
+
 
     def __rmul__(self, scalar):
         """Wrapper function of self.__mul__ for operation overloading on "*"."""
 
-        return self.__mul__(scalar)
+        return self.multiply_scalar(scalar)
 
     def __truediv__(self, other):
         """Division of a scalar.
@@ -834,7 +837,7 @@ class Nutrients(object):
             for abbr in ordered_keys:
                 newNutrients_list.append(self.nutrients[abbr] / other.nutrients[abbr])
 
-        return Nutrients(input_nutrients=list(newNutrients_dict.values()))
+        return Nutrients(input_nutrients=list(newNutrients_list))
 
     # Emulating container type behaviors
     def __len__(self):

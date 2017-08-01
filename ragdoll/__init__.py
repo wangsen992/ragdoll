@@ -12,3 +12,10 @@ from .req import *
 
 
 __version__=0.1
+
+mongo = MongoDB(host='47.93.246.201', 
+				port=27017, 
+				database='eatech', 
+				user='harry', 
+				password='password',
+				collections=['USDA'])

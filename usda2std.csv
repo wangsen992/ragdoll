@@ -5,19 +5,19 @@ CHOCDF,CBH,Carbohydrate
 FAT,LIP,Lipid
 FIBTG,FIBTG,Dietary Fiber
 CHOLE,CHOLE,Cholesterol
-VITA_IU,VITA, Vitamin A
+VITA_IU,VITA,Vitamin A
 VITC,VITC,Vitamin C
 VITE,VITE,Vitamin E
 RIBF,RIBF,Riboflavin
 NIA,NIA,Niacin
-THIA,THIA, Thiamin
+THIA,THIA,Thiamin
 CA,CA,Calcium
 MG,MG,Magnesium
 FE,FE,Iron
 MN,MN,Manganese
 ZN,ZN,Zinc
 CU,CU,Copper
-K,K, Potassium
+K,K,Potassium
 P,P,Phosphorus
 NA,NA,Sodium
 SE,SE,Selenium
