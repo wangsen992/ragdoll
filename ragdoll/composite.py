@@ -26,8 +26,13 @@ recipe_entry_format_str = "{index:<5} {value:<10.1f} {unit:<5s} {db:10s} {name: 
 
 # standard nutrient list order
 std_nut = ['PROCNT', 'CBH', 'LIP', 'FIBTG', 'CHOLE', 'VITA', 'VITC', 'VITE',
+<<<<<<< HEAD
            'RIBF', 'NIA', 'THIA',
            'SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU']
+=======
+		   'RIBF', 'NIA', 'THIA',
+		   'SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU', 'P']
+>>>>>>> 7b7f95e05cfc83ab7f4a23ae068209e0d9d0cd8d
 macro_nut = ['PROCNT', 'CBH', 'LIP']
 vit_nut = ['VITA', 'VITC', 'VITE', 'RIBF', 'NIA', 'THIA']
 min_nut = ['SE', 'MG', 'K', 'ZN', 'MN', 'NA', 'CA', 'FE', 'CU']
