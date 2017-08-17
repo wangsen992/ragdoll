@@ -15,7 +15,7 @@ import os
 
 import pandas as pd
 
-from .composite import Nutrient, Nutrients
+from .nutrient import Nutrient, Nutrients
 
 nut_dict_file = "{root}/ragdoll/NUTR_DEF_more.csv".format(root=os.getcwd())
 

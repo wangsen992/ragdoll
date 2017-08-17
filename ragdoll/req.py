@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 from .db import MongoDB
-from .composite import Nutrient, Nutrients
+from .nutrient import *
 
 
 nut_dict_file = "{root}/ragdoll/NUTR_DEF_more.csv".format(root=os.getcwd())
@@ -56,6 +56,7 @@ class Requirement(Nutrients):
                        age=self.human.age,
                        gender=self.human.gender,
                        PAL=self.human.PAL)
+
         self.nutrients.add_nutrients(energy)
 
     def get_macro(self):
@@ -79,7 +80,7 @@ class Requirement(Nutrients):
                         name_source='Foodmate')
         carbs = Nutrient(name="Carbohydrate",
                          unit='g',
-                         value=energy.value * AMRD['CHOCDF'] / 4.0,
+                         value=energy.value * AMRD['CBH'] / 4.0,
                          abbr='CBH',
                          source='Analytical',
                          name_source="Foodmate")

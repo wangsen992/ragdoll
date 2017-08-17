@@ -49,6 +49,9 @@ class MongoDB(object):
         index_sample = random.sample(range(count), size)
 
         docs = [col_cursor[i] for i in index_sample]
+        for doc in docs:
+            doc['collection'] = col_name
+            doc['_id'] = doc['_id'].__str__()
 
         return docs
 
@@ -63,6 +66,8 @@ class MongoDB(object):
 
         collection = self.database[col_name]
         doc = collection.find_one({'_id': ObjectId(item_id)})
+        doc['collection'] = col_name
+        doc['_id'] = doc['_id'].__str__()
 
         return doc
 

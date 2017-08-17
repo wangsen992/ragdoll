@@ -1,7 +1,7 @@
 """
 A simple draft for loading nutritional informations from different sources.
 """
-from .composite import *
+from .nutrient import *
 
 from pandas import Series
 
@@ -14,32 +14,10 @@ def nutrient_constructor(nut_doc):
     abbr = nut_doc['abbr']
 
     return Nutrient(name=name, 
-                    value=value, 
+                    value=value,
                     unit=unit, 
                     abbr=abbr)
 
-
-def ingredient_constructor(ing_doc, col_name='', item_id=''):
-
-    name = ing_doc['name']['long']
-    value = 100
-    unit = 'g'
-    nutrient_list = []
-
-    for nutrient in ing_doc['nutrients']:
-        nutrient_list.append(nutrient_constructor(nutrient))
-
-    nutrients = Nutrients(input_nutrients=nutrient_list)
-
-    ingredient =  IngredientComponent(name=name,
-                                      value=value,
-                                      nutrients=nutrients,
-                                      unit=unit,
-                                      meta={"collection" : col_name,
-                                            "item_id" : item_id})
-
-  
-    return ingredient
 
 class Loader(object):
 
@@ -53,7 +31,7 @@ class Loader(object):
     #     for nut in doc:
     #         index.append(nut['name'])
     #         data.append(nut['value'])
-    #         units.append(nut['unit'])
+    #         units.append(nut['unit']
 
     #     nutrients = Nutrients(data=data, units=units, index=index)
 
@@ -64,8 +42,3 @@ class Loader(object):
         nut_list = [nutrient_constructor(nut_doc) for nut_doc in doc]
 
         return Nutrients(input_nutrients=nut_list)
-
-    @staticmethod
-    def ingre_loader(doc, col_name='', item_id=''):
-
-        return ingredient_constructor(doc, col_name, item_id)

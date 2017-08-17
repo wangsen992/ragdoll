@@ -3,7 +3,8 @@ Ragdoll initialisation.
 """
 
 from .db import *
-from .composite import *
+from .nutrient import *
+from .component import *
 from .loader import *
 from .dictionary import *
 from .human import *
@@ -18,4 +19,4 @@ mongo = MongoDB(host='47.93.246.201',
 				database='eatech', 
 				user='harry', 
 				password='password',
-				collections=['USDA'])
+				collections=['FM'])

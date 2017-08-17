@@ -22,6 +22,7 @@ def update_usda_doc(doc):
 
 	# ingre level
 	new_doc['name'] = doc['name']
+	new_doc['_id'] = doc['_id']
 	new_doc['nutrients'] = []
 	vite_amt = 0
 
@@ -64,6 +65,11 @@ if __name__ == '__main__':
 	# new_doc = update_usda_doc(ingre_doc)
 	# ingre = Loader.ingre_loader(new_doc)
 
+	# get cursor for source collection
+	old_cursor = mongo.database['USDA'].find()
+	old_count = old_cursor.count()
+	print("Total number of docs in USDA: {}".format(old_count))
+
 	# get existing names for check
 	new_name_cursor = mongo.database['usda'].find(projection={'_id':0, 'name.long':1})
 	new_name_list = [doc['name']['long'] for doc in new_name_cursor]
@@ -71,11 +77,14 @@ if __name__ == '__main__':
 
 	# recreate a new usda
 
-	for doc in mongo.database['USDA'].find():
+	for i, doc in enumerate(mongo.database['USDA'].find()):
 
 		if doc['name']['long'] in new_name_list:
 			continue
 		new_doc = update_usda_doc(doc)
 		mongo.database['usda'].insert(new_doc)
+
+		if i % 200 == 0:
+			print("Progress report: {} of {}".format(i+1, old_count))
 
 	print("Finished")

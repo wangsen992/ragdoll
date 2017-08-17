@@ -4,6 +4,7 @@ import random
 from ragdoll import *
 
 
+# functions for current test
 def concat(list_of_comps):
     
     """Concatenate a list of components
